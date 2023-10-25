@@ -1,5 +1,6 @@
 package net.agent.SchedulingAgent;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +16,16 @@ import net.agent.DSMInformation.SchedulingResults;
 
 public class InternalDataModel extends AbstractUserObject {
 	
+	//Global Variables
+	private LocalDateTime lastScheduleWriteTime = LocalDateTime.of(1970, 1, 1, 0, 0); //Create variable to measure time and initialize with outdated values
+	
 	// OPC UA 
 	private OpcUaClient opcUaClient;
 	private List<EndpointDescription> endpoints;
 	private OpcUaClientConfigBuilder cfg;
 	private EndpointDescription configPoint;
 	private AddressSpace addressSpace;
+	private int writeScheduleCount = 1; //Defines the period with which the PLC was last communicated the scheduling results
 	
 	// External Parameters
 	private double CapEx = 8000; // Capital-Costs in €
@@ -28,7 +33,6 @@ public class InternalDataModel extends AbstractUserObject {
 	private int lifetime = 20; // Lifetime of Electrolyzer
 	private double minPower = 5; // Minimum Power from Electrolyzer
 	private double maxPower = 100; // Maximum Power from Electrolyzer
-	private double CapEX_t = CapEx / lifetime; // CapEx bezogen auf Lebensdauer
 	private double PEL = 2.4; // Elektrische Leistung des Elektrolyseur in kW
 	private double discountrate = 9.73; //Discount rate
 	private double loadFactor = 0.98; //Share of full load hours per year
@@ -42,7 +46,6 @@ public class InternalDataModel extends AbstractUserObject {
 	private double penaltyFactor = 0.002; // Penalty-Term (Value: 0.09)
 	private int iteration = 0; // Iteration
 	private double epsilonProduction = 0.005; // Tolerable deviation from the required production quantity
-	private boolean schedulingComplete = false;
 	private int currentPeriod = 1;
 	private boolean stateProduction = true;
 	private boolean stateStandby;
@@ -50,17 +53,15 @@ public class InternalDataModel extends AbstractUserObject {
 
 	// Gather-Information
 	private double sumProduction;
-	private double sumProduction_temp;
+	private double sumProduction_temp;//TODO wird die Variable benutzt?
 	private int CountReceivedMessages = 0;
 	private boolean enableMessageReceive = false; // is set in Dual Update
 	private boolean receiveMessages = true;
 
-	// Equations
-	private double mH2_t;
-
 	// Variables
 	private double x; // Leistung von Elektrolyseur/Agent
 	private double z; // Hilfsvariable für z
+	private boolean schedulingComplete; //Boolean variable to indicate whether planning horizon was scheduled completed 
 
 	// ---- DSMInformationen ----
 	private DSMInformation dsmInformation;
@@ -114,7 +115,6 @@ public class InternalDataModel extends AbstractUserObject {
     public SchedulingResults getSchedulingResults() {
         return schedulingResults;
     }
-	
 
 	// Hashmap für Informationsaustausch
 	private HashMap<Integer, HashMap<AID, Double>> totalListScheduling;
@@ -161,6 +161,34 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	// ---- Getter & Setter ----
+	
+	public LocalDateTime getLastScheduleWriteTime() {
+		return lastScheduleWriteTime;
+	}
+
+	public void setLastScheduleWriteTime(LocalDateTime lastScheduleWriteTime) {
+		this.lastScheduleWriteTime = lastScheduleWriteTime;
+	}
+	
+	public int getWriteScheduleCount() {
+		return writeScheduleCount;
+	}
+
+	public void setWriteScheduleCount(int writeScheduleCount) {
+		this.writeScheduleCount = writeScheduleCount;
+	}
+	
+	public void incrementWriteScheduleCount(){
+		this.writeScheduleCount = writeScheduleCount + 1;
+	}
+	
+	public boolean isSchedulingComplete() {
+		return schedulingComplete;
+	}
+
+	public void setSchedulingComplete(boolean schedulingComplete) {
+		this.schedulingComplete = schedulingComplete;
+	}
 	
 	public double getCapEx() {
 		return CapEx;
@@ -389,11 +417,6 @@ public class InternalDataModel extends AbstractUserObject {
 
 	public void setStateIdle(boolean stateIdle) {
 		this.stateIdle = stateIdle;
-	}
-
-	public double getCapEX_t() {
-		this.CapEX_t = CapEx / (lifetime * 8760);
-		return CapEX_t;
 	}
 
 	public double getPEL() {

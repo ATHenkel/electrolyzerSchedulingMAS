@@ -57,6 +57,14 @@ public class SchedulingResults {
             System.out.println(); // Blank line to separate results for different periods
         }
     }
+    
+    public Map<Integer, Map<String, Object>> getResults() {
+        return results;
+    }
+    
+    public int getNumberScheduledPeriods() {
+        return results.size(); //Returns the number of results (periods)
+    }
 
     
 }

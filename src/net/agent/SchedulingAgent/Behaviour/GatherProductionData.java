@@ -124,6 +124,11 @@ public class GatherProductionData extends OneShotBehaviour {
 				
 				// Next Behaviour to be executed
 				System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode: " + this.schedulingAgent.getInternalDataModel().getCurrentPeriod() + " Iteration: " + this.schedulingAgent.getInternalDataModel().getIteration() + " Scheduling Done Activated!" );
+				
+				//Set Scheduling Complete Variable to True
+				this.schedulingAgent.getInternalDataModel().setSchedulingComplete(true);
+
+				//Next behaviour to be executed 
 				SchedulingDone schedulingDone = new SchedulingDone(schedulingAgent);
 				this.schedulingAgent.addBehaviour(schedulingDone);
 
