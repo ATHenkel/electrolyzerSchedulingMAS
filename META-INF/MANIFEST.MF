@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: net.agent.SchedulingAgent
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: de.agent.test
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Service-Component: OSGI-INF/classLoadService.xml
+Require-Bundle: de.enflexit.api;bundle-version="1.0.0",
+ org.agentgui.lib.jade;bundle-version="4.5.1",
+ de.enflexit.common;bundle-version="1.2.9",
+ org.agentgui.core;bundle-version="2.2.6"
+Export-Package: net.agent.DSMInformation,
+ net.agent.SchedulingAgent,
+ net.agent.SchedulingAgent.Behaviour,
+ net.agent.SchedulingAgent.classLoadService,
+ opcuaClient
+Bundle-ActivationPolicy: lazy
