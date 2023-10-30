@@ -18,8 +18,8 @@ public class GetGoalOfProduction extends OneShotBehaviour {
 		DSMInformation dsmInformation = schedulingAgent.getInternalDataModel().getDSMInformation();
 		 dsmInformation.addExternalDSMInformation(1, 0.047585 * 1.88, 0.05); 
 		 dsmInformation.addExternalDSMInformation(2, 0.047585 * 2.8, 0.05); 
-		 dsmInformation.addExternalDSMInformation(3, 0.047585 * 1.4, 0.05); 
-		 dsmInformation.addExternalDSMInformation(4, 0.047585 * 1.5, 0.05);
+		 dsmInformation.addExternalDSMInformation(3, 0.047585 * 1.7, 0.05); 
+		 dsmInformation.addExternalDSMInformation(4, 0.047585 * 2.43, 0.05);
 		 double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);  
 
 		//Als nächstes auszuführendes Behaviour 

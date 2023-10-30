@@ -1,20 +1,15 @@
 package net.agent.SchedulingAgent.Behaviour;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Map;
-import java.util.Random;
 
 import org.eclipse.milo.opcua.sdk.client.AddressSpace;
-import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableNode;
-import org.eclipse.milo.opcua.stack.core.UaException;
-import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
-import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
-import org.eclipse.milo.opcua.stack.core.util.annotations.UInt32Primitive;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
-import org.eclipse.milo.opcua.stack.core.types.structured.WriteValue;
 
 import jade.core.behaviours.TickerBehaviour;
 import net.agent.DSMInformation.SchedulingResults;
@@ -28,6 +23,40 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
     }
 
     SchedulingAgent schedulingAgent;
+    
+    public void writeOpcUaDataToExcel(String filepath, String AgentID, int Period, double Demand, double setpoint, LocalDateTime currentTime,
+            Float H2ProductionRateVOp, Float H2ProductionRateVOut,Float H2Flowrate) {
+        String header;
+        String data;
+        boolean headerWritten = this.schedulingAgent.getInternalDataModel().isHeaderWritten();
+
+        //Create Header 
+		if (headerWritten == true) {
+			header = "Agent;Periode;Demand;X;Time;H2ProductionRateVOp;H2ProductionRateVOut;H2Flowrate";
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
+				{
+					writer.write(header);
+					writer.newLine();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			this.schedulingAgent.getInternalDataModel().setHeaderWritten(false);
+		} 
+		
+		// Create Data
+		data = AgentID + ";" + Period + ";" + Demand + ";" + setpoint + ";" + currentTime + ";"
+				+ H2ProductionRateVOp + ";" + H2ProductionRateVOut + ";" + H2Flowrate;
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
+			{
+				writer.write(data);
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+
 
     @Override
     protected void onTick() {
@@ -42,19 +71,27 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 			agentId = -1; // Default value if the conversion fails.
 		}
 		//-----------------
-    	
+		
+		
     	// Get information from the internal data model
         AddressSpace addressSpace = this.schedulingAgent.getInternalDataModel().getAddressSpace();
         Boolean schedulingComplete = this.schedulingAgent.getInternalDataModel().isSchedulingComplete();
         LocalDateTime lastScheduleWriteTime = this.schedulingAgent.getInternalDataModel().getLastScheduleWriteTime();
         LocalDateTime currentTime = LocalDateTime.now(); //Get current Time
         double writeTimeDifference = 15; //Time difference between writing values to the PLC in seconds 
+        int nextPeriod = this.schedulingAgent.getInternalDataModel().getSchedulingResultNextPeriod();
+
         SchedulingResults schedulingResults = this.schedulingAgent.getInternalDataModel().getSchedulingResults(); //Get Scheduling Results
         int numberScheduledPeriods = schedulingResults.getNumberScheduledPeriods();
-        int writeScheduleCount = this.schedulingAgent.getInternalDataModel().getWriteScheduleCount();
-    	
+        Map<String, Object> resultNextPeriod = schedulingResults.getResult(nextPeriod);
+        
         // Calculate the difference between the times
         Duration timeDifference = Duration.between(lastScheduleWriteTime, currentTime);
+        
+        //Write Data to Excel
+        String agentID = this.schedulingAgent.getLocalName();
+        int Iteration = this.schedulingAgent.getInternalDataModel().getIteration();
+        String filepath = "D:\\\\Dokumente\\\\OneDrive - Helmut-Schmidt-Universität\\\\04_Programmierung\\\\ElectrolyseurScheduling JADE\\\\OPCUA_Agent1.csv";
 
         try {
             // Define OPC UA Node-IDs
@@ -80,31 +117,44 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
             Float H2Flowrate = (Float) H2FlowrateNode.readValue().getValue().getValue();
             
 			if (schedulingComplete && agentId == 1) {
-				if (writeScheduleCount <= numberScheduledPeriods) {
+				if (nextPeriod <= numberScheduledPeriods) {
 			        //Check if new value must be written to the PLC
 			        if (timeDifference.getSeconds() >= writeTimeDifference) {
 			        	
-			        	System.out.println("Write new Value after " + timeDifference.getSeconds() + " s " + " acutal Period: " + writeScheduleCount + " No. Periods Scheduled " + numberScheduledPeriods);
+						//Update the time and the counter 
+						this.schedulingAgent.getInternalDataModel().setLastScheduleWriteTime(LocalDateTime.now());
+						this.schedulingAgent.getInternalDataModel().incrementSchedulingResultNextPeriod();
 			        	
-						Map<String, Object> result = schedulingResults.getResult(writeScheduleCount);
-						double setpoint = (double) result.get("Setpoint");
-						float setpointFloat = (float) setpoint;
+			        	System.out.println("Write new Value after " + timeDifference.getSeconds() + " s " + " actual Period: " + nextPeriod + " No. Periods Scheduled " + numberScheduledPeriods);
+						
+			        	//Get new Setpoint
+			        	double setpointNew = (double) resultNextPeriod.get("Setpoint");
+						
+					    //Convert to data format according to OPC UA variables 
+						float setpointFloat = (float) setpointNew;
 						
 						// Write Values to OPC UA Node
 						H2ProductionRateVOpNode.writeValue(new Variant(setpointFloat));
 						H2ProductionRateApplyOpNode.writeValue(new Variant(true));
-						
-						//Update the time and the counter 
-						this.schedulingAgent.getInternalDataModel().setLastScheduleWriteTime(LocalDateTime.now());
-						this.schedulingAgent.getInternalDataModel().incrementWriteScheduleCount();
 					}
 				}
 				
 			}
             
+			//Get Values for Actual Period
+			int actualPeriod = schedulingResults.getFirstPeriod();
+			if (nextPeriod != schedulingResults.getFirstPeriod()) {
+				actualPeriod = this.schedulingAgent.getInternalDataModel().getSchedulingResultNextPeriod() - 1;
+			}
+
+	        Map<String, Object> resultActualPeriod = schedulingResults.getResult(actualPeriod);
+	        double setpoint = (double) resultActualPeriod.get("Setpoint");
+	        double demand = (double) resultActualPeriod.get("Demand");
+			
 			if (agentId == 1) {
 	            System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Ausgabe der Nodes alle 2 Sekunden:");
 	            System.out.println("H2ProductionRate: " + H2ProductionRateVOp);
+	           writeOpcUaDataToExcel(filepath, agentID, actualPeriod, demand, setpoint, currentTime, H2ProductionRateVOp, H2ProductionRateVOut, H2Flowrate);
 			}
 
         } catch (Exception e) {

@@ -120,7 +120,7 @@ public class MinimizeX extends OneShotBehaviour {
 		// Minimize Lx
 		minimizeLx();
 
-		//TODO Kommentar ergänzen was hier gemacht wird  dada
+		//Messages can be received again 
 		if (this.schedulingAgent.getInternalDataModel().isEnableMessageReceive()) {
 			this.schedulingAgent.getInternalDataModel().setReceiveMessages(true);
 		}

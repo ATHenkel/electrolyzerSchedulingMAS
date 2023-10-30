@@ -28,7 +28,7 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 				int msgIteration = Integer.parseInt(parts[0]);
 				double msgProductionQuantity = Double.parseDouble(parts[1]);
 
-				// Prüfen, ob die Nachricht zur aktuellen Iteration gehört
+				// Check if the message belongs to the current iteration
 				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 0) {
 					// Add Production Quantity to temporary Variable
 					this.schedulingAgent.getInternalDataModel().setSumProduction_temp(msgProductionQuantity);
@@ -40,15 +40,6 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 				// Increase Message Counter
 				this.schedulingAgent.getInternalDataModel().increaseCountReceivedMessages();
 
-				/*
-				System.out.println("Agent-Id: " + this.schedulingAgent.getLocalName() + " Iteration Agent: "
-						+ this.schedulingAgent.getInternalDataModel().getIteration() + " IterationMsg " + msgIteration
-						+ " Absender: " + senderName + " Alte Prod.menge: "
-						+ df.format(this.schedulingAgent.getInternalDataModel().getSumProduction_temp())
-						+ " Prod.menge erhalten: " + df.format(msgProductionQuantity) + " neue Produk.menge:"
-						+ df.format(sumProduction) + " Anzahl empfangener Nachrichten (neu): "
-						+ this.schedulingAgent.getInternalDataModel().getCountReceivedMessages());*/
-
 				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 2
 						&& this.schedulingAgent.getInternalDataModel().getIteration() == msgIteration) {
 					
@@ -57,13 +48,6 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 					this.schedulingAgent.getInternalDataModel().setCountReceivedMessages(0);
 					this.schedulingAgent.getInternalDataModel().setSumProduction_temp(0);
 					this.schedulingAgent.getInternalDataModel().setSumProduction(sumProduction);
-
-					// Get Data
-					int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
-					int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
-					double demand =this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);
-					double productionQuantity = this.schedulingAgent.getInternalDataModel()
-							.getProductionQuantityForPeriodAndIteration(currentPeriod, currentIteration); // own ProductionQty
 
 					GatherProductionData gatherProductionData = new GatherProductionData(schedulingAgent);
 					this.schedulingAgent.addBehaviour(gatherProductionData);

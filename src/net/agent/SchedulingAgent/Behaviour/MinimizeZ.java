@@ -45,7 +45,6 @@ public class MinimizeZ extends OneShotBehaviour {
 		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
 		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);
-		//double demand = this.schedulingAgent.getInternalDataModel().getDemand();
 		
 		double increment = 0.1;//TODO Inkrement anpassen Z
 		double x = this.schedulingAgent.getInternalDataModel().getX();

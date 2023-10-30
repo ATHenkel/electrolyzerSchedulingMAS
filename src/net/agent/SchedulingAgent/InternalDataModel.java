@@ -25,7 +25,8 @@ public class InternalDataModel extends AbstractUserObject {
 	private OpcUaClientConfigBuilder cfg;
 	private EndpointDescription configPoint;
 	private AddressSpace addressSpace;
-	private int writeScheduleCount = 1; //Defines the period with which the PLC was last communicated the scheduling results
+	private int schedulingResultNextPeriod = 1; //Defines the period with which the PLC was last communicated the scheduling results
+	private boolean headerWritten = true; //Boolean variable to make sure that header will be written only 1x 
 	
 	// External Parameters
 	private double CapEx = 8000; // Capital-Costs in €
@@ -37,9 +38,9 @@ public class InternalDataModel extends AbstractUserObject {
 	private double discountrate = 9.73; //Discount rate
 	private double loadFactor = 0.98; //Share of full load hours per year
 	
-	private double ProductionCoefficientA = -0.0000007433;
-	private double ProductionCoefficientB = 0.0005638988;
-	private double ProductionCoefficientC = -0.0013710495;
+	private double ProductionCoefficientA = -0.0000003819;
+	private double ProductionCoefficientB = 0.0005029463;
+	private double ProductionCoefficientC = -0.0008;
 
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint
@@ -162,6 +163,14 @@ public class InternalDataModel extends AbstractUserObject {
 
 	// ---- Getter & Setter ----
 	
+	public boolean isHeaderWritten() {
+		return headerWritten;
+	}
+
+	public void setHeaderWritten(boolean headerWritten) {
+		this.headerWritten = headerWritten;
+	}
+	
 	public LocalDateTime getLastScheduleWriteTime() {
 		return lastScheduleWriteTime;
 	}
@@ -170,16 +179,16 @@ public class InternalDataModel extends AbstractUserObject {
 		this.lastScheduleWriteTime = lastScheduleWriteTime;
 	}
 	
-	public int getWriteScheduleCount() {
-		return writeScheduleCount;
+	public int getSchedulingResultNextPeriod() {
+		return schedulingResultNextPeriod;
 	}
 
-	public void setWriteScheduleCount(int writeScheduleCount) {
-		this.writeScheduleCount = writeScheduleCount;
+	public void setSchedulingResultNextPeriod(int writeScheduleCount) {
+		this.schedulingResultNextPeriod = writeScheduleCount;
 	}
 	
-	public void incrementWriteScheduleCount(){
-		this.writeScheduleCount = writeScheduleCount + 1;
+	public void incrementSchedulingResultNextPeriod(){
+		this.schedulingResultNextPeriod = schedulingResultNextPeriod + 1;
 	}
 	
 	public boolean isSchedulingComplete() {

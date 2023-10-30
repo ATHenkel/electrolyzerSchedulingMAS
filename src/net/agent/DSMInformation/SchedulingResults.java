@@ -1,5 +1,6 @@
 package net.agent.DSMInformation;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class SchedulingResults {
@@ -30,6 +31,13 @@ public class SchedulingResults {
         return results.get(period);
     }
     
+    public int getFirstPeriod() {
+        Iterator<Map.Entry<Integer, Map<String, Object>>> iterator = results.entrySet().iterator();
+        if (iterator.hasNext()) {
+            return iterator.next().getKey();
+        }
+        return -1; // Return -1 or handle it differently if the map is empty
+    }
     
     public void printOptimizationResults() {
         // Überprüfen Sie, ob Optimierungsergebnisse vorhanden sind

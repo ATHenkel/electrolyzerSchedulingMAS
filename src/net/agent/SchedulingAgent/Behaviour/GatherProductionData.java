@@ -26,8 +26,6 @@ public class GatherProductionData extends OneShotBehaviour {
 		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation()
 				.getProductionQuantityForPeriod(currentPeriod);
 		double demandDeviation = productionQuantity + sumProduction - demand;
-
-	//	System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Iteration " + currentIteration + " DemandDeviaton " + demandDeviation + " x " + this.schedulingAgent.getInternalDataModel().getX() + " z " + this.schedulingAgent.getInternalDataModel().getZ() + " Lambda: " + this.schedulingAgent.getInternalDataModel().getLambda());
 		
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;
@@ -82,7 +80,7 @@ public class GatherProductionData extends OneShotBehaviour {
 				.getmLCOH();
 		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 
-		// ---- Write Data to Excel ----
+		// ---- Write Data to Excel --> Parse Agent-ID to Integer-Value --- 
 		String localName = this.schedulingAgent.getLocalName();
 		int agentId;
 		try {
@@ -114,7 +112,8 @@ public class GatherProductionData extends OneShotBehaviour {
 
 			if (currentPeriod < lastPeriod) {
 				this.schedulingAgent.getInternalDataModel().incrementCurrentPeriod();
-				this.schedulingAgent.getInternalDataModel().setReceiveMessages(true); 
+				this.schedulingAgent.getInternalDataModel().incrementIteration();
+				this.schedulingAgent.getInternalDataModel().setEnableMessageReceive(true);
 
 				// Next Behaviour to be executed
 				MinimizeX minimizeX = new MinimizeX(schedulingAgent);
