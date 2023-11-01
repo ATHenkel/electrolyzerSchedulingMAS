@@ -1,5 +1,9 @@
 package net.agent.SchedulingAgent.Behaviour;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
@@ -10,6 +14,24 @@ public class MinimizeX extends OneShotBehaviour {
 	public MinimizeX(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
+	
+    public void writeOpcUaDataToExcel(int period, int iteration, double x, double mLCOH, double lambda, double minMLCOH, double z) {
+    	 String filepath = "D:\\\\Dokumente\\\\OneDrive - Helmut-Schmidt-Universität\\\\04_Programmierung\\\\ElectrolyseurScheduling JADE\\\\MinX_Agent1.csv";
+    	
+        String data;
+
+		// Create Data
+		data = period + ";" + iteration + ";" + x + ";" + mLCOH + ";" + lambda + ";" + minMLCOH + ";" + z;
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
+			{
+				writer.write(data);
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+	
 	
 	public double getAnnualNominalProduction() {
 		double ProductionCoefficientA = this.schedulingAgent.getInternalDataModel().getProductionCoefficientA();
@@ -47,7 +69,7 @@ public class MinimizeX extends OneShotBehaviour {
 	}
 
 	public double minimizeLx() {
-
+	
 		// Get Information from the InternalDataModel
 		double CapEx = this.schedulingAgent.getInternalDataModel().getCapEx();
 		double PEL = this.schedulingAgent.getInternalDataModel().getPEL();
@@ -65,9 +87,10 @@ public class MinimizeX extends OneShotBehaviour {
 		double z = this.schedulingAgent.getInternalDataModel().getZ();
 		
 		// Parameters for Solving
+		double min_mLCOHLambda = Double.POSITIVE_INFINITY;
 		double min_mLCOH = Double.POSITIVE_INFINITY;
 		double mH2_hour;
-		double increment = 0.1; //TODO Inkrement anpassen X
+		double increment = 	1/this.schedulingAgent.getInternalDataModel().getMaxPower() ; //TODO Inkrement anpassen X, aktuelle für 1W Leistung 
 		double toleranceMinPower = 0.01; // Tolerance threshold, set to 0.01 (1%)
 		
 		// Calculate Present Worth Factor (PWF) and hourly Costs
@@ -82,21 +105,24 @@ public class MinimizeX extends OneShotBehaviour {
 		// Check whether the electrolyser is in production mode
 		if (stateProduction) {
 			// Loop over the range of values of the realizable load of the electrolyzer
-			for (double x = minPower; x <= this.schedulingAgent.getInternalDataModel().getMaxPower(); x += increment) {
+			for (double x = minPower; x < this.schedulingAgent.getInternalDataModel().getMaxPower(); x += increment) {
 				mH2_hour = getHourlyProductionQuantity(x);
 				double OpEx = PEL * (x/100) * electricityPrice;
-				double mLCOH = OMCost + (annuityCostPerHour + OpEx)/mH2_hour + lambda*(x - z);
+				double mLCOH = OMCost + (annuityCostPerHour + OpEx)/mH2_hour + lambda*((x - z)/100);
 				
 				// If the current mLCOH value is less than the previous minimum, update the minimum and the X value.
-				if (mLCOH < min_mLCOH) {
-					min_mLCOH = OMCost + (annuityCostPerHour + OpEx)/mH2_hour; // set minmLCOH without lambda-Term
+				if (mLCOH < min_mLCOHLambda) {
+					min_mLCOHLambda = OMCost + (annuityCostPerHour + OpEx)/mH2_hour + lambda*(x-z)/100; // set min mLCOH with lambda-Term
+					min_mLCOH = OMCost + (annuityCostPerHour + OpEx)/mH2_hour;
 					min_x_value = x;
 				}
 			}
-		} else {
+		} 
+		else {
 			// The electrolyzer is not in production mode, therefore the production is 0
 			min_x_value = 0.0;
 		}
+		
 
 		/*//TODO Noch korrigieren 
 		 * if (Math.abs(min_x_value - minPower) < toleranceMinPower && false) {

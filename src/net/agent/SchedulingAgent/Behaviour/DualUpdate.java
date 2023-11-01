@@ -19,7 +19,7 @@ public class DualUpdate extends OneShotBehaviour {
 		double ProductionCoefficientC = this.schedulingAgent.getInternalDataModel().getProductionCoefficientC();
 		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation().getElectricityPriceForPeriod(currentPeriod);
 			
-		// TODO:Lambda ergänzen?
+		// TODO:Lambda ergänzen? + Ableitung prüfen 
 		double gradientmLCOH = (electricityPrice * PEL) / (100
 				* (ProductionCoefficientA * Math.pow(x, 2) + ProductionCoefficientB * x + ProductionCoefficientC))
 				- (electricityPrice * PEL * x * (2 * ProductionCoefficientA * x + ProductionCoefficientB))
@@ -44,9 +44,21 @@ public class DualUpdate extends OneShotBehaviour {
 		double demandPercentage = Math.abs(demandDeviation / demand) * 100; 
 
 		// Update Lambda
-		lambda = lambda + (penaltyFactor * calculateGradientmLCOH(x) / demandPercentage) * (x - z);
+		lambda = lambda + penaltyFactor * calculateGradientmLCOH(x) * demandPercentage *(x-z);
+		//lambda = lambda + penaltyFactor * (x-z)/x;
 		
-		//  Set and reset values
+    	//-----------------
+        //Test
+		String localName = this.schedulingAgent.getLocalName();
+		int agentId;
+		try {
+			agentId = Integer.parseInt(localName);
+		} catch (NumberFormatException e) {
+			agentId = -1; // Default value if the conversion fails.
+		}
+	
+		//-----------------
+				//  Set and reset values
 		this.schedulingAgent.getInternalDataModel().setLambda(lambda);
 		this.schedulingAgent.getInternalDataModel().incrementIteration();
 		this.schedulingAgent.getInternalDataModel().setEnableMessageReceive(true);

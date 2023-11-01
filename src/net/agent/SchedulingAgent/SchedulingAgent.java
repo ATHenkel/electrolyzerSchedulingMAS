@@ -24,10 +24,6 @@ public class SchedulingAgent extends Agent {
 		double lowerBound = this.getInternalDataModel().getMinPower();
 		double upperBound = this.getInternalDataModel().getMaxPower();
 		
-		// Initialize Lagrange multipliers and penalty term
-		this.getInternalDataModel().setLambda(0); 
-		this.getInternalDataModel().setPenaltyFactor(0.09);
-
 		// Generate a random value for x and z within the bounds.
 		double initialX = lowerBound + Math.random() * (upperBound - lowerBound); // Initial Value for x
 		double initialZ = lowerBound + Math.random() * (upperBound - lowerBound); // Initial Value for z
@@ -38,8 +34,8 @@ public class SchedulingAgent extends Agent {
 		MessageReceiveBehaviour messageReceiveBehaviour = new MessageReceiveBehaviour(this);
 		this.addBehaviour(messageReceiveBehaviour);
 		
-		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-		this.addBehaviour(opcuaConnection);
+		//OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+		//this.addBehaviour(opcuaConnection);
 		
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
 		this.addBehaviour(getGoalOfProduction);

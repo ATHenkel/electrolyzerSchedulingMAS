@@ -62,7 +62,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
     protected void onTick() {
     	
     	//-----------------
-        //Test
+        //Test//TODO TEST
 		String localName = this.schedulingAgent.getLocalName();
 		int agentId;
 		try {
@@ -115,7 +115,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
             Float H2ProductionRateVOut = (Float) H2ProductionRateVOutNode.readValue().getValue().getValue();
             Boolean H2ProductionRateApplyOp = (Boolean) H2ProductionRateApplyOpNode.readValue().getValue().getValue();
             Float H2Flowrate = (Float) H2FlowrateNode.readValue().getValue().getValue();
-            H2Flowrate = (float) (H2Flowrate * 0.0708);
+            H2Flowrate = (float) (H2Flowrate * 0.0708); //convert Value from Nl/h in kg/h  
             
 			if (schedulingComplete && agentId == 1) {
 				if (nextPeriod <= numberScheduledPeriods) {
@@ -139,7 +139,6 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 						H2ProductionRateApplyOpNode.writeValue(new Variant(true));
 					}
 				}
-				
 			}
             
 			//Get Values for Actual Period

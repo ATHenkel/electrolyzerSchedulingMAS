@@ -69,9 +69,9 @@ public class MinimizeZ extends OneShotBehaviour {
 			// Loop over the range of values of the realizable load of the electrolyzer
 			for (double z = minPower; z <= maxPower; z += increment) {
 
-			//	System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Iteration " + this.schedulingAgent.getInternalDataModel().getIteration() + " SumProduction: " + sumProduction);
-				double dzProduction = sumProduction + ProductionCoefficientA * Math.pow(z, 2)
-						+ ProductionCoefficientB * z + ProductionCoefficientC - demand + lambda*0.00001*(x - z);
+				//TODO Z-anpasssen?
+				//double dzProduction = sumProduction + ProductionCoefficientA * Math.pow(z, 2) + ProductionCoefficientB * z + ProductionCoefficientC - demand + (lambda*(x - z)/100)*0.04494;
+				double dzProduction = sumProduction + ProductionCoefficientA * Math.pow(z, 2) + ProductionCoefficientB * z + ProductionCoefficientC - demand;
 				double diffToZero = Math.abs(dzProduction - 0);
 
 				// If the current difference to 0 is smaller than the previous minimum, update the minimum and the Z-value

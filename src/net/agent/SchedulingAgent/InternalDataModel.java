@@ -44,9 +44,9 @@ public class InternalDataModel extends AbstractUserObject {
 
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint
-	private double penaltyFactor = 0.002; // Penalty-Term (Value: 0.09)
+	private double penaltyFactor = 0.2; // Penalty-Term (Value: .099)
 	private int iteration = 0; // Iteration
-	private double epsilonProduction = 0.005; // Tolerable deviation from the required production quantity
+	private double epsilonProduction = 0.0001; // Tolerable deviation from the required production quantity (Value: 0.005)
 	private int currentPeriod = 1;
 	private boolean stateProduction = true;
 	private boolean stateStandby;
