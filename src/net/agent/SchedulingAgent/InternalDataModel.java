@@ -43,18 +43,18 @@ public class InternalDataModel extends AbstractUserObject {
 	private double ProductionCoefficientC = -0.0008;
 
 	// ADMM - Lagrange Multiplicators
-	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint
-	private double penaltyFactor = 0.2; // Penalty-Term (Value: .099)
+	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
+	private double penaltyFactor = 0.5; // Penalty-Term (Value: 0.5)
 	private int iteration = 0; // Iteration
-	private double epsilonProduction = 0.0001; // Tolerable deviation from the required production quantity (Value: 0.005)
+	private double epsilonProduction = 0.0005; // Tolerable deviation from the required production quantity (Value: 0.001 (fast convergence))
 	private int currentPeriod = 1;
 	private boolean stateProduction = true;
 	private boolean stateStandby;
 	private boolean stateIdle;
-
+	
 	// Gather-Information
 	private double sumProduction;
-	private double sumProduction_temp;//TODO wird die Variable benutzt?
+	private double sumProduction_temp;
 	private int CountReceivedMessages = 0;
 	private boolean enableMessageReceive = false; // is set in Dual Update
 	private boolean receiveMessages = true;

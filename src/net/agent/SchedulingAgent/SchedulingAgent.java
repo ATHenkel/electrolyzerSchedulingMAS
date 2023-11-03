@@ -21,21 +21,12 @@ public class SchedulingAgent extends Agent {
 	
 	protected void setup() {
 		
-		double lowerBound = this.getInternalDataModel().getMinPower();
-		double upperBound = this.getInternalDataModel().getMaxPower();
-		
-		// Generate a random value for x and z within the bounds.
-		double initialX = lowerBound + Math.random() * (upperBound - lowerBound); // Initial Value for x
-		double initialZ = lowerBound + Math.random() * (upperBound - lowerBound); // Initial Value for z
-		this.getInternalDataModel().setX(initialX);
-		this.getInternalDataModel().setZ(initialZ);
-		
 		//Will be called during instantiation
 		MessageReceiveBehaviour messageReceiveBehaviour = new MessageReceiveBehaviour(this);
 		this.addBehaviour(messageReceiveBehaviour);
 		
-		//OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-		//this.addBehaviour(opcuaConnection);
+	//	OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+	//	this.addBehaviour(opcuaConnection);
 		
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
 		this.addBehaviour(getGoalOfProduction);

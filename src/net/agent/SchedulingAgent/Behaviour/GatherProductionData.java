@@ -24,7 +24,6 @@ public class GatherProductionData extends OneShotBehaviour {
 		double ProductionCoefficientC = this.schedulingAgent.getInternalDataModel().getProductionCoefficientC();
 		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation().getElectricityPriceForPeriod(currentPeriod);
 			
-		// TODO:Lambda ergänzen? + Ableitung prüfen 
 		double gradientmLCOH = (electricityPrice * PEL) / (100
 				* (ProductionCoefficientA * Math.pow(x, 2) + ProductionCoefficientB * x + ProductionCoefficientC))
 				- (electricityPrice * PEL * x * (2 * ProductionCoefficientA * x + ProductionCoefficientB))
@@ -44,9 +43,6 @@ public class GatherProductionData extends OneShotBehaviour {
 		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation()
 				.getProductionQuantityForPeriod(currentPeriod);
 		double demandDeviation = productionQuantity + sumProduction - demand;
-		
-		//TODO TEST
-		//System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Period: " + currentPeriod + " Iteration: " + currentIteration + " DemandDeviation: " + demandDeviation);
 		
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;
@@ -98,7 +94,7 @@ public class GatherProductionData extends OneShotBehaviour {
 		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 		double gradient = calculateGradientmLCOH(x);
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
-
+		
 		// ---- Write Data to Excel --> Parse Agent-ID to Integer-Value --- 
 		String localName = this.schedulingAgent.getLocalName();
 		int agentId;
@@ -126,6 +122,8 @@ public class GatherProductionData extends OneShotBehaviour {
 		// check if scheduling for period is done
 		if (periodScheduled() == true) {
 			this.schedulingAgent.getInternalDataModel().setLambda(0);
+			this.schedulingAgent.getInternalDataModel().setX(x);
+			this.schedulingAgent.getInternalDataModel().setZ(z);
 			this.schedulingAgent.getInternalDataModel().getSchedulingResults().addResult(currentPeriod,
 					electricityPrice, false, false, true, x, mLCOH, productionQuantity, demand);
 
@@ -139,20 +137,21 @@ public class GatherProductionData extends OneShotBehaviour {
 				this.schedulingAgent.addBehaviour(minimizeX);
 			}
 			if (currentPeriod == lastPeriod) {
-				
+
 				// Next Behaviour to be executed
-				System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode: " + this.schedulingAgent.getInternalDataModel().getCurrentPeriod() + " Iteration: " + this.schedulingAgent.getInternalDataModel().getIteration() + " Scheduling Done Activated!" );
-				
-				//Set Scheduling Complete Variable to True
+				System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode: "
+						+ this.schedulingAgent.getInternalDataModel().getCurrentPeriod() + " Iteration: "
+						+ this.schedulingAgent.getInternalDataModel().getIteration() + " Scheduling Done Activated!");
+
+				// Set Scheduling Complete Variable to True
 				this.schedulingAgent.getInternalDataModel().setSchedulingComplete(true);
 
-				//Next behaviour to be executed 
+				// Next behaviour to be executed
 				SchedulingDone schedulingDone = new SchedulingDone(schedulingAgent);
 				this.schedulingAgent.addBehaviour(schedulingDone);
-
 			}
 
-		} else if (periodScheduled() == false) {
+		} else {
 			// Next Behaviour to be executed
 			MinimizeZ minimizeZ = new MinimizeZ(schedulingAgent);
 			this.schedulingAgent.addBehaviour(minimizeZ);

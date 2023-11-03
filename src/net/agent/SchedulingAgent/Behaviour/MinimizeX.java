@@ -90,7 +90,7 @@ public class MinimizeX extends OneShotBehaviour {
 		double min_mLCOHLambda = Double.POSITIVE_INFINITY;
 		double min_mLCOH = Double.POSITIVE_INFINITY;
 		double mH2_hour;
-		double increment = 	1/this.schedulingAgent.getInternalDataModel().getMaxPower() ; //TODO Inkrement anpassen X, aktuelle für 1W Leistung 
+		double increment = 	1/this.schedulingAgent.getInternalDataModel().getMaxPower(); 
 		double toleranceMinPower = 0.01; // Tolerance threshold, set to 0.01 (1%)
 		
 		// Calculate Present Worth Factor (PWF) and hourly Costs

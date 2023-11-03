@@ -61,8 +61,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
     @Override
     protected void onTick() {
     	
-    	//-----------------
-        //Test//TODO TEST
+    	//Get Agent-ID as Integer
 		String localName = this.schedulingAgent.getLocalName();
 		int agentId;
 		try {
@@ -70,8 +69,6 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 		} catch (NumberFormatException e) {
 			agentId = -1; // Default value if the conversion fails.
 		}
-		//-----------------
-		
 		
     	// Get information from the internal data model
         AddressSpace addressSpace = this.schedulingAgent.getInternalDataModel().getAddressSpace();
@@ -79,7 +76,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
         LocalDateTime lastScheduleWriteTime = this.schedulingAgent.getInternalDataModel().getLastScheduleWriteTime();
         LocalDateTime currentTime = LocalDateTime.now(); //Get current Time
         String formattedTime = String.format("%02d:%02d:%02d", currentTime.getHour(), currentTime.getMinute(), currentTime.getSecond());// Formatted Time
-        double writeTimeDifference = 15; //Time difference between writing values to the PLC in seconds 
+        double writeTimeDifference = 45; //Time difference between writing values to the PLC in seconds 
         int nextPeriod = this.schedulingAgent.getInternalDataModel().getSchedulingResultNextPeriod();
 
         SchedulingResults schedulingResults = this.schedulingAgent.getInternalDataModel().getSchedulingResults(); //Get Scheduling Results
@@ -115,7 +112,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
             Float H2ProductionRateVOut = (Float) H2ProductionRateVOutNode.readValue().getValue().getValue();
             Boolean H2ProductionRateApplyOp = (Boolean) H2ProductionRateApplyOpNode.readValue().getValue().getValue();
             Float H2Flowrate = (Float) H2FlowrateNode.readValue().getValue().getValue();
-            H2Flowrate = (float) (H2Flowrate * 0.0708); //convert Value from Nl/h in kg/h  
+            H2Flowrate = (float) (H2Flowrate * (0.002015/22.41)); //convert Value from Nl/h in kg/h  
             
 			if (schedulingComplete && agentId == 1) {
 				if (nextPeriod <= numberScheduledPeriods) {
