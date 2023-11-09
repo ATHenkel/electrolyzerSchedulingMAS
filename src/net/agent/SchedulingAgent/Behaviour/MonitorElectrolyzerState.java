@@ -57,7 +57,6 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 		}
     }
 
-
     @Override
     protected void onTick() {
     	
@@ -148,6 +147,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 	        double setpoint = (double) resultActualPeriod.get("Setpoint");
 	        double demand = (double) resultActualPeriod.get("Demand");
 			
+	        //TODO Test, online for Agent 1
 			if (agentId == 1) {
 	            System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Ausgabe der Nodes alle 2 Sekunden:");
 	            System.out.println("H2ProductionRate: " + H2ProductionRateVOp);

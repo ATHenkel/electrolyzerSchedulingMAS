@@ -17,8 +17,6 @@ public class BroadcastProductionData extends OneShotBehaviour {
 
 	@Override
 	public void action() {
-		//System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " BrodcastProductionData "  + "Periode: "  + this.schedulingAgent.getInternalDataModel().getCurrentPeriod());
-
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
 		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
 

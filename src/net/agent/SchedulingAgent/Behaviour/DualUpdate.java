@@ -3,6 +3,7 @@ package net.agent.SchedulingAgent.Behaviour;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
@@ -15,21 +16,21 @@ public class DualUpdate extends OneShotBehaviour {
 	}
 	
 	public void writeMatrixToExcel(int AgentID, int Periode, int Iteration, double ownProduction,
-			double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda, double demandPercentage) {
+			double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda, double demandPercentage, Long currentTimeMs) {
 		String filepath = "D:\\\\Dokumente\\\\OneDrive - Helmut-Schmidt-Universität\\\\04_Programmierung\\\\ElectrolyseurScheduling JADE\\\\DualUpdate.csv";
 		String header;
 		String data;
 
 		if (Iteration == 0) {
 			// Create the heading line
-			header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda;demandPercentage";
+			header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda;demandPercentage; CurrentTime";
 		} else {
 			header = "";
 		}
 
 		// Create the data row
 		data = AgentID + ";" + Periode + ";" + Iteration + ";" + ownProduction + ";" + receivedProductionQuantity + ";"
-				+ Demand + ";" + x + ";" + z + ";" + gradient + ";" + lambda + ";" + demandPercentage;
+				+ Demand + ";" + x + ";" + z + ";" + gradient + ";" + lambda + ";" + demandPercentage + ";" + currentTimeMs;
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
 			// If the iteration is 0, write the heading line
@@ -75,6 +76,8 @@ public class DualUpdate extends OneShotBehaviour {
 		double x = this.schedulingAgent.getInternalDataModel().getX();
 		double demandDeviation = productionQuantity + sumProduction - demand;
 		double demandPercentage = Math.abs(demandDeviation / demand);
+		long currentMilliseconds = System.currentTimeMillis();
+
 				
     	//Get Agent-ID as Integer
 		String localName = this.schedulingAgent.getLocalName();
@@ -95,7 +98,7 @@ public class DualUpdate extends OneShotBehaviour {
 		}
 		
 		//Write Results into .csv-file
-		writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x, z, calculateGradientmLCOH(x), lambda, demandPercentage);
+		writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x, z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds);
 		
 		// Update Lambda 
 		lambda = lambda + penaltyFactor * Math.abs(calculateGradientmLCOH(x))*(x-z)*k;
@@ -104,6 +107,12 @@ public class DualUpdate extends OneShotBehaviour {
 		this.schedulingAgent.getInternalDataModel().setLambda(lambda);
 		this.schedulingAgent.getInternalDataModel().incrementIteration();
 		this.schedulingAgent.getInternalDataModel().setEnableMessageReceive(true);
+		
+		//TODO: Simulate electrolyzer failure 
+		if (agentId == 2 && currentPeriod == 10 && currentIteration == 1269) {
+			System.out.println("Agent 2 simulate Electrolyzer Failure");
+			this.schedulingAgent.getInternalDataModel().setStateProduction(false);
+		}
 		
 		//Next behaviour to be executed
 		MinimizeX minimizeX = new MinimizeX(schedulingAgent);

@@ -35,14 +35,16 @@ public class GatherProductionData extends OneShotBehaviour {
 	public boolean periodScheduled() {
 		boolean periodScheduled = false;
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
-		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
-		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
+			int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
+			double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 		double epsilonProduction = this.schedulingAgent.getInternalDataModel().getEpsilonProduction();
 		double productionQuantity = this.schedulingAgent.getInternalDataModel()
 				.getProductionQuantityForPeriodAndIteration(currentPeriod, currentIteration); // own Production
 		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation()
 				.getProductionQuantityForPeriod(currentPeriod);
 		double demandDeviation = productionQuantity + sumProduction - demand;
+		
+	//	System.out.println("Agent: " + this.schedulingAgent.getLocalName() +  "Period: " + currentPeriod + " Iteration: " + currentIteration + " DemandDeviation: " + demandDeviation);
 		
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;
