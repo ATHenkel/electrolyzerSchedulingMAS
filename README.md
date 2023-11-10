@@ -1,6 +1,7 @@
 # Decentralized ADMM Scheduling Model for Modular Electrolysis Plants
-
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+<p align="center">
+  <img src="https://github.com/ATHenkel/electrolyzerSchedulingMAS/assets/99994741/a60c3134-d71d-47e2-88f2-0fea9e6ef5e6" alt="Bild" width="300"/>
+</p>
 
 ## Introduction
 
@@ -43,6 +44,6 @@ Detailed instructions for setting up Agent.Workbench are available here:
 - **Optimization:** The model minimizes the levelized cost of hydrogen (LCOH) while meeting demand and considering various operational constraints.
 - **Scalability:** Demonstrates scalability by adapting to an increasing number of electrolysis PEAs without manual configuration effort.
 
-![grafik](https://github.com/ATHenkel/electrolyzerSchedulingMAS/assets/99994741/a60c3134-d71d-47e2-88f2-0fea9e6ef5e6)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 
