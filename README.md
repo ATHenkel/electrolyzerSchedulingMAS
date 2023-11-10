@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/ATHenkel/electrolyzerSchedulingMAS/assets/99994741/a60c3134-d71d-47e2-88f2-0fea9e6ef5e6" alt="Bild" width="300"/>
+  <img src="https://github.com/ATHenkel/electrolyzerSchedulingMAS/assets/99994741/a60c3134-d71d-47e2-88f2-0fea9e6ef5e6" alt="Bild" width="300" style="margin-bottom: -20px;"/>
 </p>
 
 # Decentralized ADMM Scheduling Model for Modular Electrolysis Plants
