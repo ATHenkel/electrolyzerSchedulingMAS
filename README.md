@@ -6,6 +6,23 @@
 
 This repository contains the implementation of a decentralized Alternating Direction Method of Multipliers (ADMM) scheduling model for optimizing the operation of modular electrolysis plants. The model is designed to balance hydrogen production with fluctuating demand, minimizing the levelized cost of hydrogen (LCOH) and ensuring adaptability to operational challenges.
 
+## Getting Started
+
+To set up and run the project, follow these steps:
+
+### Prerequisites
+
+Make sure you have the following prerequisites installed:
+
+- [Agent.Workbench](https://enflexit.gitbook.io/agent-workbench/)
+
+### Installation
+
+1. Clone the repository to your local machine:
+
+   ```bash
+   git clone https://github.com/YourUsername/YourRepository.git
+
 ## Table of Contents
 
 - [Introduction](#introduction)
