@@ -37,20 +37,12 @@ Detailed instructions for setting up Agent.Workbench are available here:
    ```bash
    git clone https://github.com/YourUsername/YourRepository.git
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Case Study](#case-study)
-- [Results and Discussion](#results-and-discussion)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Features
 
 - **Decentralized Scheduling:** The model employs a decentralized ADMM approach for scheduling, allowing for efficient and adaptive operation of modular electrolysis plants.
 - **Optimization:** The model minimizes the levelized cost of hydrogen (LCOH) while meeting demand and considering various operational constraints.
 - **Scalability:** Demonstrates scalability by adapting to an increasing number of electrolysis PEAs without manual configuration effort.
+
+![grafik](https://github.com/ATHenkel/electrolyzerSchedulingMAS/assets/99994741/a60c3134-d71d-47e2-88f2-0fea9e6ef5e6)
+
 
