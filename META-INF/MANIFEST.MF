@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.agent.SchedulingAgent
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: de.agent.test
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-19
 Service-Component: OSGI-INF/classLoadService.xml
 Require-Bundle: de.enflexit.api;bundle-version="1.0.0",
  org.agentgui.lib.jade;bundle-version="4.5.1",

@@ -32,9 +32,9 @@ public class SchedulingAgent extends Agent {
 		this.addBehaviour(getGoalOfProduction);
 
 		// Add Agents to PhoneBook
-		//TODO 3  Agent
-		//for (int i = 0; i < 3; i++) {
-		for (int i = 0; i < 10; i++) {
+		//TODO 10  Agent
+		for (int i = 0; i < 3; i++) {
+		//for (int i = 0; i < 10; i++) {
 			AID agentAID = new AID(String.valueOf(i + 1), AID.ISLOCALNAME);
 			if (agentAID != this.getAID()) {
 				this.getInternalDataModel().addAID2PhoneBook(agentAID);
