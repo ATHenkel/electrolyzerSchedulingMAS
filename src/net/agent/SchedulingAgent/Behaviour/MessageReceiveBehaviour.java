@@ -27,6 +27,7 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 
 				// Check if the message belongs to the current iteration
 				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 0) {
+					
 					// Add Production Quantity to temporary Variable
 					this.schedulingAgent.getInternalDataModel().setSumProduction_temp(msgProductionQuantity);
 					this.schedulingAgent.getInternalDataModel().setSumProduction(msgProductionQuantity);
