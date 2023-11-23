@@ -30,11 +30,10 @@ public class OPCUAConnection extends OneShotBehaviour {
 		try {
 			// Address of Simulation
 			List<EndpointDescription> endpoints = DiscoveryClient.getEndpoints("opc.tcp://139.11.207.61:8001").get();
-			// Weitere Verbindungstests hier, wenn nötig
-			return true; // Die Verbindung war erfolgreich
+			return true; // The connection was successful
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false; // Die Verbindung ist fehlgeschlagen
+			return false; // The connection was not successful
 		}
 	}
 

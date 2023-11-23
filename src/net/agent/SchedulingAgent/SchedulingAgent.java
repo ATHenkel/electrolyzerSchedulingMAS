@@ -25,8 +25,8 @@ public class SchedulingAgent extends Agent {
 		MessageReceiveBehaviour messageReceiveBehaviour = new MessageReceiveBehaviour(this);
 		this.addBehaviour(messageReceiveBehaviour);
 
-		 OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-		 this.addBehaviour(opcuaConnection);
+		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+		this.addBehaviour(opcuaConnection);
 
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
 		this.addBehaviour(getGoalOfProduction);

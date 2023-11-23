@@ -3,7 +3,6 @@ package net.agent.SchedulingAgent.Behaviour;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
@@ -68,7 +67,7 @@ public class DualUpdate extends OneShotBehaviour {
 		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
 		double productionQuantity = this.schedulingAgent.getInternalDataModel().getProductionQuantityForPeriodAndIteration(currentPeriod, currentIteration); //own Production
-		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);
+		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getDemandForPeriod(currentPeriod);
 		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
 		double penaltyFactor = this.schedulingAgent.getInternalDataModel().getPenaltyFactor();	
@@ -109,10 +108,10 @@ public class DualUpdate extends OneShotBehaviour {
 		this.schedulingAgent.getInternalDataModel().setEnableMessageReceive(true);
 		
 		//TODO: Simulate electrolyzer failure 
-		if (agentId == 2 && currentPeriod == 10 && currentIteration == 1269) {
-			System.out.println("Agent 2 simulate Electrolyzer Failure");
-			this.schedulingAgent.getInternalDataModel().setStateProduction(false);
-		}
+//		if (agentId == 2 && currentPeriod == 10 && currentIteration == 1269) {
+//			System.out.println("Agent 2 simulate Electrolyzer Failure");
+//			this.schedulingAgent.getInternalDataModel().setStateProduction(false);
+//		}
 		
 		//Next behaviour to be executed
 		MinimizeX minimizeX = new MinimizeX(schedulingAgent);

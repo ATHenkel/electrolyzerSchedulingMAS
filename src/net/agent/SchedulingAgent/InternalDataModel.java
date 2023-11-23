@@ -64,10 +64,10 @@ public class InternalDataModel extends AbstractUserObject {
 	private double z; // Hilfsvariable für z
 	private boolean schedulingComplete; //Boolean variable to indicate whether planning horizon was scheduled completed 
 
-	// ---- DSMInformationen ----
+	// ---- DSMInformationen - from SQL-Database ----
 	private DSMInformation dsmInformation;
 
-	// Methode, um auf die DSMInformation-Instanz zuzugreifen
+	// Method for accessing the DSMInformation instance
 	public DSMInformation getDSMInformation() {
 		if (dsmInformation == null) {
 			dsmInformation = new DSMInformation();

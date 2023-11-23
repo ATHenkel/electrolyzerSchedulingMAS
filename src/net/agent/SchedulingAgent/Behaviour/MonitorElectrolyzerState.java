@@ -73,12 +73,19 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
         AddressSpace addressSpace = this.schedulingAgent.getInternalDataModel().getAddressSpace();
         Boolean schedulingComplete = this.schedulingAgent.getInternalDataModel().isSchedulingComplete();
         LocalDateTime lastScheduleWriteTime = this.schedulingAgent.getInternalDataModel().getLastScheduleWriteTime();
-        LocalDateTime currentTime = LocalDateTime.now(); //Get current Time
-        String formattedTime = String.format("%02d:%02d:%02d", currentTime.getHour(), currentTime.getMinute(), currentTime.getSecond());// Formatted Time
-        double writeTimeDifference = 45; //Time difference between writing values to the PLC in seconds 
+        
+        // Get current Time
+        LocalDateTime currentTime = LocalDateTime.now(); 
+        
+        // Formatted Time	
+        String formattedTime = String.format("%02d:%02d:%02d", currentTime.getHour(), currentTime.getMinute(), currentTime.getSecond());
+        
+        //Time difference between writing values to the PLC in seconds 
+        double writeTimeDifference = 180; //3 Minutes
         int nextPeriod = this.schedulingAgent.getInternalDataModel().getSchedulingResultNextPeriod();
 
-        SchedulingResults schedulingResults = this.schedulingAgent.getInternalDataModel().getSchedulingResults(); //Get Scheduling Results
+        //Get Scheduling Results
+        SchedulingResults schedulingResults = this.schedulingAgent.getInternalDataModel().getSchedulingResults(); 
         int numberScheduledPeriods = schedulingResults.getNumberScheduledPeriods();
         Map<String, Object> resultNextPeriod = schedulingResults.getResult(nextPeriod);
         

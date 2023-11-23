@@ -41,7 +41,7 @@ public class GatherProductionData extends OneShotBehaviour {
 		double productionQuantity = this.schedulingAgent.getInternalDataModel()
 				.getProductionQuantityForPeriodAndIteration(currentPeriod, currentIteration); // own Production
 		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation()
-				.getProductionQuantityForPeriod(currentPeriod);
+				.getDemandForPeriod(currentPeriod);
 		double demandDeviation = productionQuantity + sumProduction - demand;
 		
 	//	System.out.println("Agent: " + this.schedulingAgent.getLocalName() +  "Period: " + currentPeriod + " Iteration: " + currentIteration + " DemandDeviation: " + demandDeviation);
@@ -88,7 +88,7 @@ public class GatherProductionData extends OneShotBehaviour {
 		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
 		int lastPeriod = this.schedulingAgent.getInternalDataModel().getDSMInformation().getLastPeriod();
 		double productionQuantity = this.schedulingAgent.getInternalDataModel().getProductionQuantityForPeriodAndIteration(currentPeriod, currentIteration); // own Production
-		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);
+		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getDemandForPeriod(currentPeriod);
 		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation().getElectricityPriceForPeriod(currentPeriod);
 		double x = this.schedulingAgent.getInternalDataModel().getX();
 		double z = this.schedulingAgent.getInternalDataModel().getZ();
