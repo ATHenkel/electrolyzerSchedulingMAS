@@ -32,19 +32,20 @@ public class InternalDataModel extends AbstractUserObject {
 	private double CapEx = 8000; // Capital-Costs in €
 	private double OMFactor = 1.5; // Factor for Operation & Maintenance in %
 	private int lifetime = 20; // Lifetime of Electrolyzer
-	private double minPower = 5; // Minimum Power from Electrolyzer
+	private double minPower = 9; // Minimum Power from Electrolyzer
 	private double maxPower = 100; // Maximum Power from Electrolyzer
 	private double PEL = 2.4; // Elektrische Leistung des Elektrolyseur in kW
 	private double discountrate = 9.73; //Discount rate
 	private double loadFactor = 0.98; //Share of full load hours per year
 	
-	private double ProductionCoefficientA = -0.0000003819;
-	private double ProductionCoefficientB = 0.0005029463;
-	private double ProductionCoefficientC = -0.0008;
+	
+	private double ProductionCoefficientA = -0.00000186008377263649;
+	private double ProductionCoefficientB = 0.00068054065735310900;
+	private double ProductionCoefficientC = -0.00524975504255868000;
 
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
-	private double penaltyFactor = 0.5; // Penalty-Term (Value: 0.5)
+	private double penaltyFactor = 0.2; // Penalty-Term (Value: 0.5)
 	private int iteration = 0; // Iteration
 	private double epsilonProduction = 0.0005; // Tolerable deviation from the required production quantity (Value: 0.001 (fast convergence))
 	private int currentPeriod = 1;

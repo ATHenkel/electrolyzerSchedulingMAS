@@ -14,15 +14,6 @@ public class GetGoalOfProduction extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
-    	//Get Agent-ID as Integer
-		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
-		
 		 //10 Electrolyzer, 6 Periods
 //		 dsmInformation.addExternalDSMInformation(1, 0.175, 19.48/1000); 
 //		 dsmInformation.addExternalDSMInformation(2, 0.211, 55.54/1000); 
@@ -48,11 +39,10 @@ public class GetGoalOfProduction extends OneShotBehaviour {
 		
 		
 		//Read Values from SQL-Database
-		System.out.println("Connect to SQL-Database:");
+		System.out.println("Agent " + this.schedulingAgent.getLocalName() + " connect to SQL-Database:");
 		JdbcDatabaseConnector connector = new JdbcDatabaseConnector(schedulingAgent);
 		connector.readDataFromDatabase();
 		
-
 		//Next behaviour to be executed
 		MinimizeX minimizeX = new MinimizeX(schedulingAgent);
 		this.schedulingAgent.addBehaviour(minimizeX);

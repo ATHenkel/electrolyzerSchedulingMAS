@@ -42,8 +42,8 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 				this.schedulingAgent.getInternalDataModel().increaseCountReceivedMessages();
 
 				//TODO 10  Agenten 
-				//if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 9
-				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 2
+				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 9
+				//if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 2
 						&& this.schedulingAgent.getInternalDataModel().getIteration() == msgIteration) {
 					
 					// Set and Reset Values

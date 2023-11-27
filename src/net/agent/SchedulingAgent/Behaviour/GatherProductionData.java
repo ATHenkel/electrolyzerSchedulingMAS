@@ -44,7 +44,7 @@ public class GatherProductionData extends OneShotBehaviour {
 				.getDemandForPeriod(currentPeriod);
 		double demandDeviation = productionQuantity + sumProduction - demand;
 		
-	//	System.out.println("Agent: " + this.schedulingAgent.getLocalName() +  "Period: " + currentPeriod + " Iteration: " + currentIteration + " DemandDeviation: " + demandDeviation);
+		//System.out.println("Agent: " + this.schedulingAgent.getLocalName() +  "Period: " + currentPeriod + " Iteration: " + currentIteration + " DemandDeviation: " + demandDeviation);
 		
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;

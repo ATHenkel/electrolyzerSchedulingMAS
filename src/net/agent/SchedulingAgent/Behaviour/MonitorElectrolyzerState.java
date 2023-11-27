@@ -149,11 +149,17 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 			if (nextPeriod != schedulingResults.getFirstPeriod()) {
 				actualPeriod = this.schedulingAgent.getInternalDataModel().getSchedulingResultNextPeriod() - 1;
 			}
-
-	        Map<String, Object> resultActualPeriod = schedulingResults.getResult(actualPeriod);
-	        double setpoint = (double) resultActualPeriod.get("Setpoint");
-	        double demand = (double) resultActualPeriod.get("Demand");
 			
+			//TODO: das noch schöner machen, wenn Scheduling done dann dieser wert, ansonsten 0 
+			double setpoint = 0;
+			double demand = 0;
+			
+			if (schedulingComplete) {
+				Map<String, Object> resultActualPeriod = schedulingResults.getResult(actualPeriod);
+			       setpoint = (double) resultActualPeriod.get("Setpoint");
+			       demand = (double) resultActualPeriod.get("Demand");
+			}
+
 	        //TODO Test, online for Agent 1
 			if (agentId == 1) {
 	            System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Ausgabe der Nodes alle 2 Sekunden:");
