@@ -20,7 +20,7 @@ Detailed instructions for setting up Agent.Workbench are available here:
 
 ### Installation of .jar-Files
 
-1. Download the required .jar files from the xxxxx
+1. Download the required .jar files from the attached `lib` folder.
 
 2. Create a `lib` directory in your project root if it doesn't already exist.
 
@@ -42,7 +42,7 @@ Detailed instructions for setting up Agent.Workbench are available here:
 ## Features
 
 - **Decentralized Scheduling:** The model employs a decentralized ADMM approach for scheduling, allowing for efficient and adaptive operation of modular electrolysis plants.
-- **Optimization:** The model minimizes the levelized cost of hydrogen (LCOH) while meeting demand and considering various operational constraints.
+- **Optimization:** The model minimizes the marginal levelized cost of hydrogen (mLCOH) while meeting demand and considering various operational constraints.
 - **Scalability:** Demonstrates scalability by adapting to an increasing number of electrolysis PEAs without manual configuration effort.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
