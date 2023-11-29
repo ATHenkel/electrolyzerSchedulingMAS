@@ -1,9 +1,9 @@
 package net.agent.SchedulingAgent.Behaviour;
 
+
 import java.util.List;
 
 import jade.core.behaviours.OneShotBehaviour;
-import net.agent.SchedulingAgent.InternalDataModel;
 import net.agent.SchedulingAgent.IterationADMM;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
@@ -48,7 +48,7 @@ public class SchedulingDone extends OneShotBehaviour {
 				System.out.println(formattedOutput);
 			}
 			
-			myAgent.removeBehaviour(this); //Agent soll nicht sterben
+			myAgent.removeBehaviour(this); // Agent shouldnt die
 
 		}
 

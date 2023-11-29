@@ -1,9 +1,5 @@
 package net.agent.SchedulingAgent.Behaviour;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
@@ -14,24 +10,6 @@ public class MinimizeX extends OneShotBehaviour {
 	public MinimizeX(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
-	
-    public void writeOpcUaDataToExcel(int period, int iteration, double x, double mLCOH, double lambda, double minMLCOH, double z) {
-    	 String filepath = "D:\\\\Dokumente\\\\OneDrive - Helmut-Schmidt-Universität\\\\04_Programmierung\\\\ElectrolyseurScheduling JADE\\\\MinX_Agent1.csv";
-    	
-        String data;
-
-		// Create Data
-		data = period + ";" + iteration + ";" + x + ";" + mLCOH + ";" + lambda + ";" + minMLCOH + ";" + z;
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
-			{
-				writer.write(data);
-				writer.newLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-	
 	
 	public double getAnnualNominalProduction() {
 		double ProductionCoefficientA = this.schedulingAgent.getInternalDataModel().getProductionCoefficientA();
@@ -69,29 +47,42 @@ public class MinimizeX extends OneShotBehaviour {
 	}
 
 	public double minimizeLx() {
+		
+    	//Get Agent-ID as Integer
+		String localName = this.schedulingAgent.getLocalName();
+		int agentId;
+		try {
+			agentId = Integer.parseInt(localName);
+		} catch (NumberFormatException e) {
+			agentId = -1; // Default value if the conversion fails.
+		}
 	
 		// Get Information from the InternalDataModel
 		double CapEx = this.schedulingAgent.getInternalDataModel().getCapEx();
 		double PEL = this.schedulingAgent.getInternalDataModel().getPEL();
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
+		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
 		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation()
 				.getElectricityPriceForPeriod(currentPeriod);
 		double min_x_value = this.schedulingAgent.getInternalDataModel().getMinPower();
 		double minPower = this.schedulingAgent.getInternalDataModel().getMinPower();
-		boolean stateProduction = this.schedulingAgent.getInternalDataModel().isStateProduction();
+		boolean stateStandby = this.schedulingAgent.getInternalDataModel().isStateStandby();
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
 		int lifetime = this.schedulingAgent.getInternalDataModel().getLifetime();
 		double discountrate = this.schedulingAgent.getInternalDataModel().getDiscountrate();
 		double fullLoadHours = this.schedulingAgent.getInternalDataModel().getLoadFactor()*8760; //8760 hours per year
 		double OMFactor = this.schedulingAgent.getInternalDataModel().getOMFactor();
 		double z = this.schedulingAgent.getInternalDataModel().getZ();
+		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getDemandForPeriod(currentPeriod);
+		int rowIndexShutdownOrder = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
+		int nextShutdownElectrolyzer = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(rowIndexShutdownOrder);
+		int startUpDuration = this.schedulingAgent.getInternalDataModel().getStartUpDuration();
 		
 		// Parameters for Solving
 		double min_mLCOHLambda = Double.POSITIVE_INFINITY;
 		double min_mLCOH = Double.POSITIVE_INFINITY;
 		double mH2_hour;
 		double increment = 	1/this.schedulingAgent.getInternalDataModel().getMaxPower(); 
-		double toleranceMinPower = 0.01; // Tolerance threshold, set to 0.01 (1%)
 		
 		// Calculate Present Worth Factor (PWF) and hourly Costs
 		double annuityCostPerYear = (CapEx * (discountrate * Math.pow((1 + discountrate), lifetime))) / (Math.pow(1 + discountrate, lifetime) - 1);
@@ -102,7 +93,35 @@ public class MinimizeX extends OneShotBehaviour {
 		//Calculate Costs for Operation and Maintenance as a Percentage of CapEx
 		double OMCost = OMFactor*CapEx/getAnnualNominalProduction();
 		
-		// Check whether the electrolyser is in production mode
+		//--- Standby Check ---
+		//Check, if all Electrolyzers are working at lower operating Limit 
+		if (this.schedulingAgent.getInternalDataModel().checkAllTrueForIteration(currentIteration-1)) {
+			
+			//Check, if this electrolyzer should be shutdown 
+			if (agentId == nextShutdownElectrolyzer) {
+				//Activate Standby
+				this.schedulingAgent.getInternalDataModel().setStateProduction(false);
+				this.schedulingAgent.getInternalDataModel().setStateStandby(true);
+				
+				//Set Shutdown Period 
+				this.schedulingAgent.getInternalDataModel().setPeriodShutdown(currentPeriod);
+				this.schedulingAgent.getInternalDataModel().setEarliestStartPeriod(currentPeriod+startUpDuration);
+				this.schedulingAgent.getInternalDataModel().setDemandShutdown(demand);
+				
+				//Update Shutdown Order-List
+				this.schedulingAgent.getInternalDataModel().updateShutdownOrderIndex();
+			}
+		}
+		
+		//-- Start Up Check --- 
+		//TODO Implement Start up Strategy 
+		if (stateStandby && currentPeriod >= this.schedulingAgent.getInternalDataModel().getEarliestStartPeriod() && demand > this.schedulingAgent.getInternalDataModel().getDemandShutdown()) {
+			this.schedulingAgent.getInternalDataModel().setStateProduction(true);
+			this.schedulingAgent.getInternalDataModel().setStateStandby(false);
+		}
+		
+		// Check whether the electrolyzer is in production mode
+		boolean stateProduction = this.schedulingAgent.getInternalDataModel().isStateProduction();
 		if (stateProduction) {
 			// Loop over the range of values of the realizable load of the electrolyzer
 			for (double x = minPower; x < this.schedulingAgent.getInternalDataModel().getMaxPower(); x += increment) {
@@ -122,14 +141,6 @@ public class MinimizeX extends OneShotBehaviour {
 			// The electrolyzer is not in production mode, therefore the production is 0
 			min_x_value = 0.0;
 		}
-		
-
-		/*//TODO Noch korrigieren 
-		 * if (Math.abs(min_x_value - minPower) < toleranceMinPower && false) {
-		 * //Erstmal nicht aktiv System.out.println("StandBy activated");
-		 * this.schedulingAgent.getInternalDataModel().setStateStandby(true);
-		 * this.schedulingAgent.getInternalDataModel().setStateProduction(false); }
-		 */
 		
 		// Returns the X value at which mLCOH is minimum.
 		this.schedulingAgent.getInternalDataModel().setX(min_x_value);

@@ -1,7 +1,8 @@
 package net.agent.SchedulingAgent.Behaviour;
 
+import java.util.ArrayList;
+
 import jade.core.behaviours.OneShotBehaviour;
-import net.agent.DSMInformation.DSMInformation;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
 public class GetGoalOfProduction extends OneShotBehaviour {
@@ -24,7 +25,7 @@ public class GetGoalOfProduction extends OneShotBehaviour {
 
 		
 		// 3 Electrolyzer, 12 Periods
-//		 dsmInformation.addExternalDSMInformation(1, 0.1334, 19.48/1000); 
+//		 dsmInformation.addExternalDSMInformation(1, 0.13, 19.48/1000); 
 //		 dsmInformation.addExternalDSMInformation(2, 0.0781, 55.54/1000); 
 //		 dsmInformation.addExternalDSMInformation(3, 0.0669 , 54.09/1000); 
 //		 dsmInformation.addExternalDSMInformation(4, 0.1262, 33.42/1000);
@@ -37,9 +38,15 @@ public class GetGoalOfProduction extends OneShotBehaviour {
 //		 dsmInformation.addExternalDSMInformation(11, 0.0344, 109.01/1000);
 //		 dsmInformation.addExternalDSMInformation(12, 0.0812, 105.55/1000);
 		
+		//TODO: Test for Shutdown Order
+		ArrayList<Integer> shutdownOrderList = this.schedulingAgent.getInternalDataModel().getShutdownOrderList();
+		shutdownOrderList.add(2);
+		shutdownOrderList.add(1);
+		shutdownOrderList.add(3);
+		
 		
 		//Read Values from SQL-Database
-		System.out.println("Agent " + this.schedulingAgent.getLocalName() + " connect to SQL-Database:");
+		System.out.println("Agent " + this.schedulingAgent.getLocalName() + " connect to SQL-Database");
 		JdbcDatabaseConnector connector = new JdbcDatabaseConnector(schedulingAgent);
 		connector.readDataFromDatabase();
 		

@@ -24,7 +24,7 @@ public class JdbcDatabaseConnector {
 		DSMInformation dsmInformation = schedulingAgent.getInternalDataModel().getDSMInformation();
 
 		// SQL-DB Connection information
-		String url = "jdbc:mysql://10.246.55.91:3306/emoduledatabase";
+		String url = "jdbc:mysql://127.0.0.1:3306/emoduledatabase";
 		String user = "externalUser";
 		String password = "H2Giga";
 

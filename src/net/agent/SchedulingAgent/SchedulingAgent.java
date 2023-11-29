@@ -20,21 +20,19 @@ public class SchedulingAgent extends Agent {
 	}
 
 	protected void setup() {
-
+		
 		// Will be called during instantiation
 		MessageReceiveBehaviour messageReceiveBehaviour = new MessageReceiveBehaviour(this);
 		this.addBehaviour(messageReceiveBehaviour);
 
-		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-		this.addBehaviour(opcuaConnection);
+		//OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+		//this.addBehaviour(opcuaConnection);
 
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
 		this.addBehaviour(getGoalOfProduction);
 
 		// Add Agents to PhoneBook
-		//TODO 10  Agenten
-		//for (int i = 0; i < 3; i++) {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < this.internalDataModel.getNumberofAgents(); i++) {
 			AID agentAID = new AID(String.valueOf(i + 1), AID.ISLOCALNAME);
 			if (agentAID != this.getAID()) {
 				this.getInternalDataModel().addAID2PhoneBook(agentAID);

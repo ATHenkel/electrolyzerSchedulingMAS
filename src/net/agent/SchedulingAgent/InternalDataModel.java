@@ -1,9 +1,12 @@
 package net.agent.SchedulingAgent;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.milo.opcua.sdk.client.AddressSpace;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -32,37 +35,43 @@ public class InternalDataModel extends AbstractUserObject {
 	private double CapEx = 8000; // Capital-Costs in €
 	private double OMFactor = 1.5; // Factor for Operation & Maintenance in %
 	private int lifetime = 20; // Lifetime of Electrolyzer
-	private double minPower = 9; // Minimum Power from Electrolyzer
+	private double minPower = 10; // Minimum Power from Electrolyzer
 	private double maxPower = 100; // Maximum Power from Electrolyzer
 	private double PEL = 2.4; // Elektrische Leistung des Elektrolyseur in kW
 	private double discountrate = 9.73; //Discount rate
 	private double loadFactor = 0.98; //Share of full load hours per year
-	
-	
 	private double ProductionCoefficientA = -0.00000186008377263649;
 	private double ProductionCoefficientB = 0.00068054065735310900;
 	private double ProductionCoefficientC = -0.00524975504255868000;
+	private int startUpDuration = 2; 
 
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
-	private double penaltyFactor = 0.2; // Penalty-Term (Value: 0.5)
+	private double penaltyFactor = 0.18; // Penalty-Term (Value: 0.2)
 	private int iteration = 0; // Iteration
-	private double epsilonProduction = 0.0005; // Tolerable deviation from the required production quantity (Value: 0.001 (fast convergence))
+	private double epsilonProduction = 0.001; // Tolerable deviation from the required production quantity (Value: 0.0005 (fast convergence))
 	private int currentPeriod = 1;
+	private int periodShutdown;
+	private double demandShutdown;
+	private int earliestStartPeriod;
 	private boolean stateProduction = true;
 	private boolean stateStandby;
 	private boolean stateIdle;
 	
-	// Gather-Information
+	// Information within MAS 
+	private int numberofAgents = 3; 
 	private double sumProduction;
-	private double sumProduction_temp;
 	private int CountReceivedMessages = 0;
 	private boolean enableMessageReceive = false; // is set in Dual Update
 	private boolean receiveMessages = true;
+	private Map<Integer, Map<Integer, Double>> listReceivedProductionQuantities;
+	private Map<Integer, List<Boolean>> listReceivedLowerOperatingLimits;
+	private int rowIndexShutdownOrder = 0;
+	private ArrayList<Integer> shutdownOrderList = new ArrayList<Integer>();
 
 	// Variables
-	private double x; // Leistung von Elektrolyseur/Agent
-	private double z; // Hilfsvariable für z
+	private double x; // Cost optimal Utilization of the electrolyzer
+	private double z; // Demand optimal Utilization of the electrolyzer
 	private boolean schedulingComplete; //Boolean variable to indicate whether planning horizon was scheduled completed 
 
 	// ---- DSMInformationen - from SQL-Database ----
@@ -76,49 +85,16 @@ public class InternalDataModel extends AbstractUserObject {
 		return this.dsmInformation;
 	}
 
-	// ---- Ergebnisse pro Iteration ----
-	private List<IterationADMM> iterationADMMTable; // Tabelle für IterationADMM-Informationen
+	// ---- Results per Iteratiopn 
+	private List<IterationADMM> iterationADMMTable; 
 
-	// Methode zum Abrufen von iterationADMMTable
-	public List<IterationADMM> getIterationADMMTable() {
-		if (iterationADMMTable == null) {
-			iterationADMMTable = new ArrayList<IterationADMM>();
-		}
-		return iterationADMMTable;
-	}
-	
-	public void printIterationADMMValues() {
-	    // Schleife durch die iterationADMMTable und gib die Werte aus
-	    for (IterationADMM iterationADMM : getIterationADMMTable()) {
-	        System.out.printf("Period: %d, Iteration: %d, ProductionQuantity: %.2f, EnergyDemand: %.2f, mLCOH: %.2f%n",
-	                iterationADMM.getPeriod(), iterationADMM.getIteration(),
-	                iterationADMM.getProductionQuantity(), iterationADMM.getEnergyDemand(),
-	                iterationADMM.getmLCOH());
-	    }
-	}
-
-	// Methode zum Abrufen der Produktionsmenge für eine bestimmte Periode und Iteration
-	public double getProductionQuantityForPeriodAndIteration(int targetPeriod, int targetIteration) {
-		for (IterationADMM iteration : iterationADMMTable) {
-			if (iteration.getPeriod() == targetPeriod && iteration.getIteration() == targetIteration) {
-				return iteration.getProductionQuantity();
-			}
-		}
-		return -1; 
-	}
-
-	public void addIterationADMMInfo(int period, int iteration, double productionQuantity, double energyDemand, double x, double z, double mLCOH) {
-		IterationADMM info = new IterationADMM(period, iteration, productionQuantity, energyDemand, x, z, mLCOH);
-		iterationADMMTable.add(info);
-	}
-
-	// SchedulingResults
+	// Scheduling Results
 	private SchedulingResults schedulingResults;
     public SchedulingResults getSchedulingResults() {
         return schedulingResults;
     }
 
-	// Hashmap für Informationsaustausch
+	// Hash Map for Information Exchange 
 	private HashMap<Integer, HashMap<AID, Double>> totalListScheduling;
 	private HashMap<AID, Double> iterationListScheduling;
 	List<AID> phoneBook;
@@ -163,6 +139,195 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	// ---- Getter & Setter ----
+	public int getStartUpDuration() {
+		return startUpDuration;
+	}
+
+	public void setStartUpDuration(int startUpDuration) {
+		this.startUpDuration = startUpDuration;
+	}
+	
+	public void setRowIndexShutdownOrder(int rowIndexShutdownOrder) {
+		this.rowIndexShutdownOrder = rowIndexShutdownOrder;
+	}
+	
+	public int getRowIndexShutdownOrder() {
+		return rowIndexShutdownOrder;
+	}
+	
+	public void updateShutdownOrderIndex() {
+		shutdownOrderList = getShutdownOrderList();
+	    if (shutdownOrderList != null && !shutdownOrderList.isEmpty()) {
+	        rowIndexShutdownOrder = (rowIndexShutdownOrder + 1) % shutdownOrderList.size();
+	    } else {
+	        System.err.println("The shutdown order list is zero or empty.");
+	    }
+	}
+	
+	
+	public ArrayList<Integer> getShutdownOrderList() {
+		return shutdownOrderList;
+	}
+	
+	public int getShutdownOrderValue(int rowIndex) {
+		if (shutdownOrderList == null) {
+			shutdownOrderList = new ArrayList<>();
+		}
+		
+	    if (shutdownOrderList != null && rowIndex >= 0 && rowIndex < shutdownOrderList.size()) {
+	        return shutdownOrderList.get(rowIndex);
+	    } else {
+	    	// Insert your desired fallback value or error handling code here
+	        return -1; // Example fallback value
+	    }
+	}
+
+
+	public void setShutdownOrderList(ArrayList<Integer> shutdownOrderList) {
+		this.shutdownOrderList = shutdownOrderList;
+	}
+	
+	
+	public int getEarliestStartPeriod() {
+		return earliestStartPeriod;
+	}
+
+	public void setEarliestStartPeriod(int earliestStartPeriod) {
+		this.earliestStartPeriod = earliestStartPeriod;
+	}
+
+	public double getDemandShutdown() {
+		return demandShutdown;
+	}
+
+	public void setDemandShutdown(double demandShutdown) {
+		this.demandShutdown = demandShutdown;
+	}
+	
+	public int getPeriodShutdown() {
+		return periodShutdown;
+	}
+
+	public void setPeriodShutdown(int periodShutdown) {
+		this.periodShutdown = periodShutdown;
+	}
+	
+	public Map<Integer, List<Boolean>> getListReceivedLowerOperatingLimits() {
+		return listReceivedLowerOperatingLimits;
+	}
+
+	public void setListReceivedLowerOperatingLimits(Map<Integer, List<Boolean>> listReceivedLowerOperatingLimits) {
+		this.listReceivedLowerOperatingLimits = listReceivedLowerOperatingLimits;
+	}
+	
+	
+	// Method for entering a Boolean value for a specific iteration
+	   public void addLowerOperatingLimit(int iteration, boolean value) {
+		   if (listReceivedLowerOperatingLimits == null ) {
+			   listReceivedLowerOperatingLimits = new HashMap<>();
+		}
+		   
+		   // Check whether there is already a list for the iteration
+	        if (!listReceivedLowerOperatingLimits.containsKey(iteration)) {
+	            listReceivedLowerOperatingLimits.put(iteration, new ArrayList<>());
+	        }
+
+	     // Add the value to the list
+	        listReceivedLowerOperatingLimits.get(iteration).add(value);
+	    }
+    
+	// Method to check whether all Boolean values for an iteration are true
+		public boolean checkAllTrueForIteration(int iteration) {
+			   if (listReceivedLowerOperatingLimits == null ) {
+				   listReceivedLowerOperatingLimits = new HashMap<>();
+			}
+			List<Boolean> values = listReceivedLowerOperatingLimits.get(iteration);
+			// Falls es keine Liste für die Iteration gibt oder die Liste leer ist
+			if (values == null || values.isEmpty()) {
+				return false;
+			}
+
+			// Überprüfe, ob alle Werte in der Liste true sind
+			for (boolean value : values) {
+				if (!value) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+    
+	 // Method for outputting all values of lower operating values
+	    public void printAllLowerOperatingLimitValues() {
+	        for (Map.Entry<Integer, List<Boolean>> entry : listReceivedLowerOperatingLimits.entrySet()) {
+	            int iteration = entry.getKey();
+	            List<Boolean> values = entry.getValue();
+
+	            System.out.println("Iteration: " + iteration + ", Values: " + values);
+	        }
+	    }
+	
+	// Method to add received production quantity for a specific period and iteration
+	public void addReceivedProductionQuantity(int period, int iteration, double quantity) {
+        // Check if the map for the period exists, create it if not
+		if (listReceivedProductionQuantities == null) {
+			listReceivedProductionQuantities = new HashMap<>();
+		}
+		
+    	listReceivedProductionQuantities.computeIfAbsent(period, k -> new HashMap<>());
+
+        // Add the quantity to the map
+    	listReceivedProductionQuantities.get(period).put(iteration, quantity);
+    }
+
+    // Method to get received production quantity for a specific period and iteration
+    public Double getReceivedProductionQuantity(int period, int iteration) {
+        return listReceivedProductionQuantities.getOrDefault(period, new HashMap<>()).getOrDefault(iteration, 0.0);
+    }
+	
+    
+	//Method of retrieving iterationADMMTable
+	public List<IterationADMM> getIterationADMMTable() {
+		if (iterationADMMTable == null) {
+			iterationADMMTable = new ArrayList<IterationADMM>();
+		}
+		return iterationADMMTable;
+	}
+	
+	
+	// Print all Values for every Iteration 
+	public void printIterationADMMValues() {
+	    for (IterationADMM iterationADMM : getIterationADMMTable()) {
+	        System.out.printf("Period: %d, Iteration: %d, ProductionQuantity: %.2f, EnergyDemand: %.2f, mLCOH: %.2f%n",
+	                iterationADMM.getPeriod(), iterationADMM.getIteration(),
+	                iterationADMM.getProductionQuantity(), iterationADMM.getEnergyDemand(),
+	                iterationADMM.getmLCOH());
+	    }
+	}
+
+	// Get Values for a specific Iteration and Period 
+	public double getProductionQuantityForPeriodAndIteration(int targetPeriod, int targetIteration) {
+		for (IterationADMM iteration : iterationADMMTable) {
+			if (iteration.getPeriod() == targetPeriod && iteration.getIteration() == targetIteration) {
+				return iteration.getProductionQuantity();
+			}
+		}
+		return -1; 
+	}
+
+	//Method for adding values to ADMMTable 
+	public void addIterationADMMInfo(int period, int iteration, double productionQuantity, double energyDemand, double x, double z, double mLCOH) {
+		IterationADMM info = new IterationADMM(period, iteration, productionQuantity, energyDemand, x, z, mLCOH);
+		iterationADMMTable.add(info);
+	}
+	
+	public int getNumberofAgents() {
+		return numberofAgents;
+	}
+
+	public void setNumberofAgents(int numberofAgents) {
+		this.numberofAgents = numberofAgents;
+	}
 	
 	public boolean isHeaderWritten() {
 		return headerWritten;
@@ -302,14 +467,6 @@ public class InternalDataModel extends AbstractUserObject {
 
 	public void setReceiveMessages(boolean receiveMessages) {
 		this.receiveMessages = receiveMessages;
-	}
-	
-	public double getSumProduction_temp() {
-		return sumProduction_temp;
-	}
-
-	public void setSumProduction_temp(double sumProduction_temp) {
-		this.sumProduction_temp = sumProduction_temp;
 	}
 	
 	public void increaseCountReceivedMessages() {
