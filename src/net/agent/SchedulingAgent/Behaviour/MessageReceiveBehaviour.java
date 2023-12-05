@@ -42,11 +42,6 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 				boolean msgLowerOperatingLimit = Boolean.parseBoolean(parts[2]);
 				int msgRowIndexShutdownOrder = Integer.parseInt(parts[3]);
 				
-				//TODO TEST:
-//				if (agentId == 1) {
-//					System.out.println("Iteration: " + iteration + " Sender: " + receivedMsg.getSender() + " lowerLimit: " + msgLowerOperatingLimit);
-//				}
-
 				//Check whether the row index of the agent differs from the received row index 
 				if (msgRowIndexShutdownOrder != rowIndexShutdownOrder) {
 					this.schedulingAgent.getInternalDataModel().setRowIndexShutdownOrder(msgRowIndexShutdownOrder);

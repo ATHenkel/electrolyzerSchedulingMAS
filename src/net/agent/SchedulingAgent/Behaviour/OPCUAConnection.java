@@ -23,19 +23,7 @@ public class OPCUAConnection extends OneShotBehaviour {
 	public OPCUAConnection(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
-
 	SchedulingAgent schedulingAgent;
-
-	private boolean checkConnection() {
-		try {
-			// Address of Simulation
-			List<EndpointDescription> endpoints = DiscoveryClient.getEndpoints("opc.tcp://139.11.207.61:8001").get();
-			return true; // The connection was successful
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false; // The connection was not successful
-		}
-	}
 
 	@Override
 	public void action() {
