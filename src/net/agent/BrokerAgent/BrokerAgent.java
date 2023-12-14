@@ -1,7 +1,7 @@
 package net.agent.BrokerAgent;
 
 import jade.core.Agent;
-import net.agent.BrokerAgent.Behaviour.instantiateSchedulingAgents;
+import net.agent.BrokerAgent.Behaviour.instantiateAgents;
 
 public class BrokerAgent extends Agent {
 
@@ -19,8 +19,8 @@ public class BrokerAgent extends Agent {
 	protected void setup() {
 		
 		// Will be called during instantiation
-		instantiateSchedulingAgents instantiateSchedulingAgents = new instantiateSchedulingAgents(this);
-		this.addBehaviour(instantiateSchedulingAgents);
+		instantiateAgents instantiateAgents = new instantiateAgents(this);
+		this.addBehaviour(instantiateAgents);
 	}
 
 }

@@ -17,14 +17,14 @@ public class DualUpdate extends OneShotBehaviour {
 
 	public void writeMatrixToExcel(int AgentID, int Periode, int Iteration, double ownProduction,
 			double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda,
-			double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer) {
+			double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer, double k) {
 		String filepath = "D:\\\\Dokumente\\\\OneDrive - Helmut-Schmidt-Universität\\\\04_Programmierung\\\\ElectrolyseurScheduling JADE\\\\DualUpdate.csv";
 		String header;
 		String data;
 
 		if (Iteration == 0) {
 			// Create the heading line
-			header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda;demandPercentage; CurrentTime; ShutdownOrderIndex; ShutdownElectrolyzer";
+			header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda;demandPercentage; CurrentTime; ShutdownOrderIndex; ShutdownElectrolyzer; k";
 		} else {
 			header = "";
 		}
@@ -32,7 +32,7 @@ public class DualUpdate extends OneShotBehaviour {
 		// Create the data row
 		data = AgentID + ";" + Periode + ";" + Iteration + ";" + ownProduction + ";" + receivedProductionQuantity + ";"
 				+ Demand + ";" + x + ";" + z + ";" + gradient + ";" + lambda + ";" + demandPercentage + ";"
-				+ currentTimeMs + ";" + shutdownOrderIndex + ";" + shutdownElectrolyzer;
+				+ currentTimeMs + ";" + shutdownOrderIndex + ";" + shutdownElectrolyzer + ";" + k;
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
 			// If the iteration is 0, write the heading line
@@ -92,23 +92,30 @@ public class DualUpdate extends OneShotBehaviour {
 			agentId = -1; // Default value if the conversion fails.
 		}
 
+		double scalingfactor = 0;
 		if (this.schedulingAgent.getInternalDataModel().isStateProduction()) {
 
 			// Variable k to penalize the deviation between x and z exponentially
-			double k;
 			double delta = Math.abs(x - z);
+			
+			//Scaling factor for Penalty 
+			double k;
 
 			// Limit the exponent to a maximum of 3.5, but only for larger deviations
 			double limitedExponent;
 			if (delta > 2) {
 				limitedExponent = Math.min(delta, 3.5);
+				//TODO: Penalty-Factor hier manuell angepasst 
+				penaltyFactor = 0.15;
 			} else {
 				// For small deviations (delta <= 2.0), use a function that grows faster
 				limitedExponent = 1.0 + Math.pow(delta, 3);
+				penaltyFactor = 0.18;
 			}
 
 			// Calculate the value of Math.exp with the limited exponent
 			k = Math.exp(limitedExponent);
+			scalingfactor = k;
 
 			// double Gradient
 			double gradient = Math.abs(calculateGradientmLCOH(x)) + 0.00001;
@@ -121,9 +128,10 @@ public class DualUpdate extends OneShotBehaviour {
 		int shutdownorderIndex = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
 		int electrolyzershutdown = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(shutdownorderIndex);
 		
+		double k;
 		// Write Results into .csv-file
 					writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
-							z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown);
+							z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown, scalingfactor);
 		
 		// Set and reset values
 		this.schedulingAgent.getInternalDataModel().setLambda(lambda);

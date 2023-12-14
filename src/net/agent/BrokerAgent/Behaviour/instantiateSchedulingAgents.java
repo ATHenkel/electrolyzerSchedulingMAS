@@ -24,11 +24,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import agentgui.core.jade.Platform;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
-import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.BrokerAgent.BrokerAgent;
@@ -54,44 +54,48 @@ public class instantiateSchedulingAgents extends OneShotBehaviour {
 		List<String> uniqueEndpoints = readXmlAndGetEndpoints(xmlFilePath);
 		this.brokerAgent.getInternalDataModel().setValidEndpoints(testAndFilterEndpoints(uniqueEndpoints));
 		List<String> validEndpoints = this.brokerAgent.getInternalDataModel().getValidEndpoints();
-
-		System.out.println("Gültige Endpoint-URLs für Electrolyzer:");
-		for (String endpoint : this.brokerAgent.getInternalDataModel().getValidEndpoints()) {
-			System.out.println(endpoint);
+		
+		for (String string : validEndpoints) {
+			System.out.println("Gültige Endpoint-URLs: " + string);
+			System.out.println("Anzahl an Agenten: " + validEndpoints.size());
 		}
 
-        int numberOfAgents = this.brokerAgent.getInternalDataModel().getValidEndpoints().size();
+      
+		//Define the number of scheduling agents that need to be instantiated 
+		int numberOfAgents = validEndpoints.size();
 
-        // Starte die JADE-Plattform
+        // Start the JADE-Plattform
         Runtime rt = Runtime.instance();
         Profile p = new ProfileImpl();
         AgentContainer container = rt.createMainContainer(p);
 
-     // Erstelle eine Liste von Scheduling-Agenten
+        // Create a list of scheduling agents
         List<SchedulingAgent> agentList = new ArrayList<>();
 
-        // Iteriere über die Anzahl der Agents und instanziere Scheduling-Agenten
+        // Iterate over the number of agents and instantiate scheduling agents
+        //TODO: Hier eigentlich validEndpoints.size() verwenden 
         for (int i = 1; i <= 3; i++) {
             try {
                 SchedulingAgent schedulingAgent = new SchedulingAgent();
-                // Füge den Agenten zur Liste hinzu
+                // Add the agent to the list
                 agentList.add(schedulingAgent);
                 // Output
-                System.out.println("SchedulingAgent" + i + " wurde erstellt.");
+                System.out.println("SchedulingAgent " + i + " wurde erstellt.");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        // Iteriere über die Liste und starte jeden Agenten
+      // Iterate over the list and start each agent
         for (int i = 0; i < agentList.size(); i++) {
             try {
-				container.acceptNewAgent(String.valueOf(i + 1), agentList.get(i)).start();
+            	container.acceptNewAgent(String.valueOf(i + 1), agentList.get(i)).start();
+				
 			} catch (StaleProxyException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 			}
-            System.out.println("SchedulingAgent" + (i + 1) + " wurde gestartet.");
+            System.out.println("SchedulingAgent " + (i + 1) + " wurde gestartet.");
         }
 		
 		// Next Behaviour to be executed
