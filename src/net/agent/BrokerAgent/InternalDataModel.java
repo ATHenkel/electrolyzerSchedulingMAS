@@ -11,6 +11,7 @@ import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfigBuilder;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import agentgui.core.common.AbstractUserObject;
 import jade.core.AID;
+import net.agent.BrokerAgent.Behaviour.instantiateAgents.Module;
 
 public class InternalDataModel extends AbstractUserObject {
 	
@@ -27,8 +28,22 @@ public class InternalDataModel extends AbstractUserObject {
 	//MAS information 
 	List<AID> phoneBook;
 	
+	//Module-List
+	List<Module> modules = new ArrayList<>();
+	
 	// ---- Getter & Setter ----
 	
+    public void addModule(Module module) {
+        modules.add(module);
+    }
+	
+	public List<Module> getModules() {
+		return modules;
+	}
+
+	public void setModules(List<Module> modules) {
+		this.modules = modules;
+	}
 	public List<String> getValidEndpoints() {
 		if (validEndpoints == null) {
 			validEndpoints = new ArrayList<>();

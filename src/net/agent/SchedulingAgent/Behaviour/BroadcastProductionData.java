@@ -33,7 +33,7 @@ public class BroadcastProductionData extends OneShotBehaviour {
 			 lowerOperatingLimitReached = true;
 		 }
 		
-	    // currentIteration und productionQuantity in ein Textformat umwandeln
+	    // Convert currentIteration and productionQuantity into a text format
 	    String currentIterationStr = Integer.toString(currentIteration);
 	    String productionQuantityStr = Double.toString(productionQuantity);
 	    String lowerOperatingLimitReachedStr = Boolean.toString(lowerOperatingLimitReached);
@@ -42,7 +42,7 @@ public class BroadcastProductionData extends OneShotBehaviour {
 		List<AID> temporaryPhoneBook = this.schedulingAgent.getInternalDataModel().getPhoneBook();
 		AID myAID = this.schedulingAgent.getAID();
 
-	    // Die beiden Werte in die Nachricht einfügen, z.B. durch Trennzeichen
+	    // Separate the two values in the message using separators
 	    String content = currentIterationStr + "," + productionQuantityStr + "," + lowerOperatingLimitReachedStr + "," + rowIndexShutdownOrderStr;
 	  
 		for (int i = 0; i < temporaryPhoneBook.size(); i++) {

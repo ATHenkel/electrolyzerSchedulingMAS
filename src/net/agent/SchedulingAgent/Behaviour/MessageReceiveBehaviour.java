@@ -15,14 +15,6 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 
 	@Override
 	public void action() {
-    	//Get Agent-ID as Integer
-		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
 		
 		//Get Values from Internal Data Model 
 		int numberOfAgents = this.schedulingAgent.getInternalDataModel().getNumberofAgents();

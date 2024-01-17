@@ -57,37 +57,19 @@ public class GatherProductionData extends OneShotBehaviour {
 		return periodScheduled;
 	}
 
-	public void writeMatrixToExcel(String filepath, int AgentID, int Periode, int Iteration, double ownProduction,
-			double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda) {
-		String header;
-		String data;
-
-		if (Iteration == 0) {
-			// Create the heading line
-			header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda";
-		} else {
-			header = "";
-		}
-
-		// Create the data row
-		data = AgentID + ";" + Periode + ";" + Iteration + ";" + ownProduction + ";" + receivedProductionQuantity + ";"
-				+ Demand + ";" + x + ";" + z + ";" + gradient + ";" + lambda;
-
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
-			// If the iteration is 0, write the heading line
-			if (Iteration == 0) {
-				writer.write(header);
-				writer.newLine(); // New line after the headings
-			}
-			writer.write(data);
-			writer.newLine(); // New line after the data
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public void action() {
+		// Get Agent-ID as Integer
+		String localName = this.schedulingAgent.getLocalName();
+		int agentId;
+		try {
+			agentId = Integer.parseInt(localName);
+		} catch (NumberFormatException e) {
+			agentId = -1; // Default value if the conversion fails.
+		}
+		
+		//Get Values from internal knowledge base
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
 		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
 		int lastPeriod = this.schedulingAgent.getInternalDataModel().getDSMInformation().getLastPeriod();
@@ -99,30 +81,14 @@ public class GatherProductionData extends OneShotBehaviour {
 				.getElectricityPriceForPeriod(currentPeriod);
 		double x = this.schedulingAgent.getInternalDataModel().getX();
 		double z = this.schedulingAgent.getInternalDataModel().getZ();
-		double mLCOH = this.schedulingAgent.getInternalDataModel().getIterationADMMTable().get(currentIteration)
-				.getmLCOH();
-		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
-		double gradient = calculateGradientmLCOH(x);
+		double mLCOH = this.schedulingAgent.getInternalDataModel().getIterationADMMTable().get(currentIteration).getmLCOH();
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
-		int numberOfAgents = this.schedulingAgent.getInternalDataModel().getNumberofAgents();
-
-		// ---- Write Data to Excel Parse Agent-ID to Integer-Value ---
-		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
-
-		// Create csv.table for each agent and write values
-		for (int i = 1; i <= numberOfAgents; i++) {
-			String filepath = String.format(
-					"D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\ADMM_Agent%d.csv",
-					i);
-			writeMatrixToExcel(filepath, agentId, currentPeriod, currentIteration, productionQuantity, sumProduction,
-					demand, x, z, gradient, lambda);
-		}
+		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
+		double demandDeviation = productionQuantity + sumProduction - demand;
+		double demandPercentage = Math.abs(demandDeviation / demand);
+		long currentMilliseconds = System.currentTimeMillis();
+		int shutdownorderIndex = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
+		int electrolyzershutdown = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(shutdownorderIndex);
 
 		// check if scheduling for period is reached
 		if (periodScheduled() == true) {
@@ -131,6 +97,12 @@ public class GatherProductionData extends OneShotBehaviour {
 			this.schedulingAgent.getInternalDataModel().setZ(z);
 			this.schedulingAgent.getInternalDataModel().getSchedulingResults().addResult(currentPeriod,
 					electricityPrice, false, false, true, x, mLCOH, productionQuantity, demand);
+			
+			double scalingfactor = 0;
+			
+			// Write Results into .csv-file
+			writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
+					z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown, scalingfactor);
 
 			if (currentPeriod < lastPeriod) {
 				this.schedulingAgent.getInternalDataModel().incrementCurrentPeriod();
@@ -163,5 +135,30 @@ public class GatherProductionData extends OneShotBehaviour {
 		}
 
 	}
+	
+	//Write results of current iteration into .csv-file
+	public void writeMatrixToExcel(int AgentID, int Periode, int Iteration, double ownProduction,
+			double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda,
+			double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer, double k) {
+		String filepath = "D:\\\\Dokumente\\\\OneDrive - Helmut-Schmidt-Universität\\\\04_Programmierung\\\\ElectrolyseurScheduling JADE\\\\DualUpdate.csv";
+		String data;
+
+		// Create the data row
+		data = AgentID + ";" + Periode + ";" + Iteration + ";" + ownProduction + ";" + receivedProductionQuantity + ";"
+				+ Demand + ";" + x + ";" + z + ";" + gradient + ";" + lambda + ";" + demandPercentage + ";"
+				+ currentTimeMs + ";" + shutdownOrderIndex + ";" + shutdownElectrolyzer + ";" + k;
+
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
+			// If the iteration is 0, write the heading line
+			if (Iteration == 0) {
+				writer.newLine(); // New line after the headings
+			}
+			writer.write(data);
+			writer.newLine(); // New line after the data
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 }

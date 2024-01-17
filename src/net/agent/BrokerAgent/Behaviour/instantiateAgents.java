@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,25 +33,34 @@ public class instantiateAgents extends OneShotBehaviour {
 
 	@Override
 	public void action() {
+		
+		//Get TopologyFile
 		String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Electrolysis\\Topology\\topology1.mtd";
 		List<Module> modules = parseTopologyFile(topologyFilePath);
-		printModules(modules);
-		System.out.println("-------------------");
+		this.brokerAgent.getInternalDataModel().setModules(modules);
 
-		for (Module module : modules) {
+		// Iterate over modules using Iterator to avoid ConcurrentModificationException
+		Iterator<Module> iterator = modules.iterator();
+		while (iterator.hasNext()) {
+			Module module = iterator.next();
+			
+			//Identify PEA types via DeviceClass of the PEAInformationLabel in the MTP
 			String amlFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Electrolysis\\MTP Lib\\"
 					+ module.visibleName + ".aml";
 
 			if (new File(amlFilePath).exists()) {
-				if (containsElectrolyserInfo(amlFilePath)) {
-					System.out.println(module.visibleName + " is an Electrolyser.");
-				} else {
-					System.out.println(module.visibleName + " is not an Electrolyser.");
+				//Check, if Module is an electrolyser 
+				if (!containsElectrolyserInfo(amlFilePath)) {
+					System.out.println(module.visibleName + " is not an Electrolyser. Removing from the list.");
+					iterator.remove(); // Remove the module from the list
 				}
 			} else {
 				System.out.println("File not found: " + amlFilePath);
 			}
 		}
+
+		// Print the remaining Modules
+		printModules();
 
 		// Start the JADE-Plattform
 		Runtime rt = Runtime.instance();
@@ -61,14 +71,16 @@ public class instantiateAgents extends OneShotBehaviour {
 		List<SchedulingAgent> agentList = new ArrayList<>();
 
 		// Iterate over the number of agents and instantiate scheduling agents
-		// TODO: Hier eigentlich validEndpoints.size() verwenden
+		// TODO: Hier eigentlich modules.size() verwenden --> modules.size =numberofAgents
 		for (int i = 1; i <= 3; i++) {
 			try {
-				SchedulingAgent schedulingAgent = new SchedulingAgent();
+				SchedulingAgent schedulingAgent = new SchedulingAgent("endpoint", "MTPName", 3); //TODO: Hier noch number of Agents ergänzen (module.size verwenden)
+				System.out.println("Endpoint-URL von Modul 1: " + modules.get(0).endpointUrl);
 				// Add the agent to the list
 				agentList.add(schedulingAgent);
+
 				// Output
-				System.out.println("SchedulingAgent " + i + " wurde erstellt.");
+				System.out.println("PEA-agent " + i + " was instantiated.");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -83,12 +95,12 @@ public class instantiateAgents extends OneShotBehaviour {
 				// Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("SchedulingAgent " + (i + 1) + " wurde gestartet.");
+			System.out.println("PEA-agent " + (i + 1) + " was started.");
 		}
-
-		// Next Behaviour to be executed
 	}
 
+	
+	// Method for reading out the MTP. The DeviceClass in the PEAInformationLabel is used to check whether it is an electrolyser
 	public static boolean containsElectrolyserInfo(String filePath) {
 		try {
 			File inputFile = new File(filePath);
@@ -128,6 +140,7 @@ public class instantiateAgents extends OneShotBehaviour {
 		return false; // Electrolyser information not found
 	}
 
+	//Definition of a module (PEA)
 	public static class Module {
 		String visibleName;
 		String endpointUrl;
@@ -143,12 +156,12 @@ public class instantiateAgents extends OneShotBehaviour {
 		}
 	}
 
-	public static List<Module> parseTopologyFile(String filePath) {
-		List<Module> modules = new ArrayList<>();
+	// Method for parsing the plant topology and identifying PEAs 
+	public List<Module> parseTopologyFile(String filePath) {
 
 		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 			String line;
-			String visibleName = null;
+			String visibleName = null; //Corresponds to the name of the MTP
 			String endpointUrl = null;
 
 			while ((line = br.readLine()) != null) {
@@ -163,7 +176,8 @@ public class instantiateAgents extends OneShotBehaviour {
 							opcServerLine.indexOf("</OPCServer>"));
 				} else if (line.contains("</IsInstance>")) {
 					if (visibleName != null && endpointUrl != null) {
-						modules.add(new Module(visibleName, endpointUrl));
+						this.brokerAgent.getInternalDataModel().addModule(new Module(visibleName, endpointUrl));
+
 						visibleName = null;
 						endpointUrl = null;
 					}
@@ -173,10 +187,13 @@ public class instantiateAgents extends OneShotBehaviour {
 			e.printStackTrace();
 		}
 
-		return modules;
+		// return modules;
+		return this.brokerAgent.getInternalDataModel().getModules();
 	}
 
-	public static void printModules(List<Module> modules) {
+	// Method for displaying all modules
+	public void printModules() {
+		List<Module> modules = this.brokerAgent.getInternalDataModel().getModules();
 		for (Module module : modules) {
 			System.out.println(module);
 		}

@@ -46,7 +46,7 @@ public class JdbcDatabaseConnector {
 				double tanklevel = resultSet.getDouble("tanklevel");
 				int timestep = resultSet.getInt("timestep");
 
-				// Add Values to dsminformation
+				// Add Values to dsminformation table
 				dsmInformation.addExternalDSMInformation(id, demand, electricityPrice, powerIn, productionQuantity,
 						tanklevel, timestep);
 			}
@@ -67,11 +67,11 @@ public class JdbcDatabaseConnector {
 		// Connect to SQL-DB
 		try (Connection connection = DriverManager.getConnection(url, user, password)) {
 
-			// SQL-Statement für das Einfügen von Daten in die Tabelle peasdata
+			// SQL statement for inserting data into the peasdata table
 			String query = "INSERT INTO peasdata (id, efficiency, loweroperatinglimit, productionrate, upperoperatinglimit) "
 					+ "VALUES (?, ?, ?, ?, ?)";
 
-			// Prepared Statement verwenden, um SQL-Injektion zu vermeiden
+			// Use prepared statement to avoid SQL injection
 			try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 				preparedStatement.setInt(1, id);
 				preparedStatement.setDouble(2, efficiency);
@@ -79,7 +79,7 @@ public class JdbcDatabaseConnector {
 				preparedStatement.setDouble(4, productionRate);
 				preparedStatement.setDouble(5, upperOperatingLimit);
 
-				// Ausführen der INSERT-Anweisung
+				// Executing the insert statement
 				preparedStatement.executeUpdate();
 			}
 

@@ -1,5 +1,7 @@
 package net.agent.SchedulingAgent.Behaviour;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.logging.log4j.Level;
@@ -8,10 +10,7 @@ import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.eclipse.milo.opcua.sdk.client.AddressSpace;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfigBuilder;
-import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableNode;
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient;
-import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
-import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import org.eclipse.milo.opcua.stack.core.util.EndpointUtil;
 
@@ -27,21 +26,39 @@ public class OPCUAConnection extends OneShotBehaviour {
 
 	@Override
 	public void action() {
-
-		Configurator.initialize(new DefaultConfiguration());
-		Configurator.setRootLevel(Level.INFO);
-
+		
 		// Internal Data Model
 		List<EndpointDescription> endpoints = this.schedulingAgent.getInternalDataModel().getEndpoints();
 		EndpointDescription configPoint = this.schedulingAgent.getInternalDataModel().getConfigPoint();
 		OpcUaClientConfigBuilder cfg = this.schedulingAgent.getInternalDataModel().getCfg();
 		OpcUaClient client = this.schedulingAgent.getInternalDataModel().getOpcUaClient();
 		AddressSpace addressSpace = this.schedulingAgent.getInternalDataModel().getAddressSpace();
+		String endpointURL = this.schedulingAgent.getInternalDataModel().getEndpointURL();
+		
+		//Decompose the endpointURL into host and port
+		URI uri;
+		String host = null;
+		int port = 0;
+		try {
+			uri = new URI(endpointURL);
+		       host = uri.getHost();
+		       port = uri.getPort();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+ 
+		Configurator.initialize(new DefaultConfiguration());
+		Configurator.setRootLevel(Level.INFO);
 
 		try {
 			// Address of Simulation
-			endpoints = DiscoveryClient.getEndpoints("opc.tcp://139.11.207.61:8001").get();
-			configPoint = EndpointUtil.updateUrl(endpoints.get(0), "139.11.207.61", 8001);
+			endpoints = DiscoveryClient.getEndpoints(endpointURL).get(); 
+			configPoint = EndpointUtil.updateUrl(endpoints.get(0), host, port);
+			
+			//TODO: Check, ob alte Version gelöscht werden kann:
+//			endpoints = DiscoveryClient.getEndpoints("opc.tcp://139.11.207.61:8001").get(); 
+//			configPoint = EndpointUtil.updateUrl(endpoints.get(0), "139.11.207.61", 8001);
+			
 			cfg.setEndpoint(configPoint);
 			// cfg.setIdentityProvider(new UsernameProvider("admin", "wago")); //set Password, if necessary
 

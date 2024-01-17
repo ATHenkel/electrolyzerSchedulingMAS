@@ -5,8 +5,15 @@ import jade.core.Agent;
 import net.agent.SchedulingAgent.Behaviour.GetGoalOfProduction;
 import net.agent.SchedulingAgent.Behaviour.MessageReceiveBehaviour;
 import net.agent.SchedulingAgent.Behaviour.OPCUAConnection;
+import net.agent.SchedulingAgent.Behaviour.initializeKnowledgebase;
 
 public class SchedulingAgent extends Agent {
+	
+    // Constructor with additional parameter for the endpoint URL and name of the MTP
+    public SchedulingAgent(String endpointUrl, String MTPname, int numberofAgents) {
+        this.getInternalDataModel().setEndpointURL(endpointUrl);
+        this.getInternalDataModel().setNumberofAgents(numberofAgents);
+    }
 
 	private static final long serialVersionUID = 1L;
 	InternalDataModel internalDataModel = new InternalDataModel();
@@ -22,12 +29,21 @@ public class SchedulingAgent extends Agent {
 	protected void setup() {
 		
 		// Will be called during instantiation
+		
+		//Message Receive behavior, runs cyclically
 		MessageReceiveBehaviour messageReceiveBehaviour = new MessageReceiveBehaviour(this);
 		this.addBehaviour(messageReceiveBehaviour);
+		
+		//Initialize knowledge base from standard integration profile
+		initializeKnowledgebase initializeKnowledgebase = new initializeKnowledgebase(this);
+		this.addBehaviour(initializeKnowledgebase);
+		
 
-		//OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-		//this.addBehaviour(opcuaConnection);
+		//Connect to Low-Level Controller via OPC-UA
+//		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+//		this.addBehaviour(opcuaConnection);
 
+		//Get Production Goals from DSM 
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
 		this.addBehaviour(getGoalOfProduction);
 

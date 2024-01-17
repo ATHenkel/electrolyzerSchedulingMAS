@@ -21,6 +21,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private LocalDateTime lastScheduleWriteTime = LocalDateTime.of(1970, 1, 1, 0, 0); //Create variable to measure time and initialize with outdated values
 	
 	// OPC UA 
+	private String endpointURL;
 	private OpcUaClient opcUaClient;
 	private List<EndpointDescription> endpoints;
 	private OpcUaClientConfigBuilder cfg;
@@ -30,19 +31,19 @@ public class InternalDataModel extends AbstractUserObject {
 	private boolean headerWritten = true; //Boolean variable to make sure that header will be written only 1x 
 	
 	// External Parameters
-	private double CapEx = 8000; // Capital-Costs in €
-	private double OMFactor = 1.5; // Factor for Operation & Maintenance in %
-	private int lifetime = 20; // Lifetime of Electrolyzer
-	private double minPower = 10; // Minimum Power from Electrolyzer
-	private double maxPower = 100; // Maximum Power from Electrolyzer
-	private double PEL = 2.4; // Elektrische Leistung des Elektrolyseur in kW
-	private double discountrate = 9.73; //Discount rate
-	private double loadFactor = 0.98; //Share of full load hours per year
-	private double ProductionCoefficientA = -0.00000186008377263649;
-	private double ProductionCoefficientB = 0.00068054065735310900;
-	private double ProductionCoefficientC = -0.00524975504255868000;
-	private int startUpDuration = 2; 
-
+	private double CapEx; // Capital-Costs in €
+	private double OMFactor; // Factor for Operation & Maintenance in %
+	private int utilizationTime; // Lifetime of Electrolyzer
+	private double minPower; // Minimum Power from Electrolyzer
+	private double maxPower; // Maximum Power from Electrolyzer
+	private double PEL; // Electrical power of the electrolyzer in kW
+	private double discountrate; //Discount rate
+	private double loadFactor; //Share of full load hours per year
+	private double ProductionCoefficientA; // f(x) = A*x^2 + B*x + C
+	private double ProductionCoefficientB;
+	private double ProductionCoefficientC;
+	private int startUpDuration; 
+	
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
 	private double penaltyFactor = 0.17; // Penalty-Term (Value: 0.2)
@@ -137,12 +138,24 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	// ---- Getter & Setter ----
+	
+	public String getEndpointURL() {
+		return endpointURL;
+	}
+
+	public void setEndpointURL(String endpointURL) {
+		this.endpointURL = endpointURL;
+	}
+
 	public int getStartUpDuration() {
 		return startUpDuration;
 	}
 
-	public void setStartUpDuration(int startUpDuration) {
-		this.startUpDuration = startUpDuration;
+	public void setStartUpDuration(double startUpDuration) {
+		//Convert start-up duration into period length
+		double periodLength = 15;
+		int startUpDurationPeriod = (int) (startUpDuration/periodLength);
+		this.startUpDuration = startUpDurationPeriod;
 	}
 	
 	public void setRowIndexShutdownOrder(int rowIndexShutdownOrder) {
@@ -376,7 +389,8 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	public void setLoadFactor(double loadFactor) {
-		this.loadFactor = loadFactor;
+		//Convert to Value without %
+		this.loadFactor = loadFactor/100;
 	}
 	
 	public double getOMFactor() {
@@ -388,12 +402,12 @@ public class InternalDataModel extends AbstractUserObject {
 		OMFactor = oMFactor;
 	}
 	
-	public int getLifetime() {
-		return lifetime;
+	public int getUtilizaziontime() {
+		return utilizationTime;
 	}
 
-	public void setLifetime(int lifetime) {
-		this.lifetime = lifetime;
+	public void setUtilizationtime(int lifetime) {
+		this.utilizationTime = lifetime;
 	}
 
 	public double getDiscountrate() {

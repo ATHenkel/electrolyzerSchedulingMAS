@@ -15,6 +15,7 @@ public class DualUpdate extends OneShotBehaviour {
 		this.schedulingAgent = schedulingAgent;
 	}
 
+	//Write results of current iteration into .csv-file
 	public void writeMatrixToExcel(int AgentID, int Periode, int Iteration, double ownProduction,
 			double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda,
 			double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer, double k) {
@@ -82,6 +83,8 @@ public class DualUpdate extends OneShotBehaviour {
 		double demandDeviation = productionQuantity + sumProduction - demand;
 		double demandPercentage = Math.abs(demandDeviation / demand);
 		long currentMilliseconds = System.currentTimeMillis();
+		int shutdownorderIndex = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
+		int electrolyzershutdown = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(shutdownorderIndex);
 
 		// Get Agent-ID as Integer
 		String localName = this.schedulingAgent.getLocalName();
@@ -105,7 +108,6 @@ public class DualUpdate extends OneShotBehaviour {
 			double limitedExponent;
 			if (delta > 2) {
 				limitedExponent = Math.min(delta, 3.5);
-				//TODO: Penalty-Factor hier manuell angepasst 
 				penaltyFactor = 0.15;
 			} else {
 				// For small deviations (delta <= 2.0), use a function that grows faster
@@ -122,13 +124,8 @@ public class DualUpdate extends OneShotBehaviour {
 
 			// Update Lambda
 			lambda = lambda + penaltyFactor * gradient * (x - z) * k;
-
 		}
 
-		int shutdownorderIndex = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
-		int electrolyzershutdown = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(shutdownorderIndex);
-		
-		double k;
 		// Write Results into .csv-file
 					writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
 							z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown, scalingfactor);

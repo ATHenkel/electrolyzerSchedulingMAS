@@ -68,7 +68,7 @@ public class MinimizeX extends OneShotBehaviour {
 		double minPower = this.schedulingAgent.getInternalDataModel().getMinPower();
 		boolean stateStandby = this.schedulingAgent.getInternalDataModel().isStateStandby();
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
-		int lifetime = this.schedulingAgent.getInternalDataModel().getLifetime();
+		int lifetime = this.schedulingAgent.getInternalDataModel().getUtilizaziontime();
 		double discountrate = this.schedulingAgent.getInternalDataModel().getDiscountrate();
 		double fullLoadHours = this.schedulingAgent.getInternalDataModel().getLoadFactor()*8760; //8760 hours per year
 		double OMFactor = this.schedulingAgent.getInternalDataModel().getOMFactor();
