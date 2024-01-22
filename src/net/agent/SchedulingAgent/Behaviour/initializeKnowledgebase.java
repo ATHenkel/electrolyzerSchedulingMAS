@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -36,18 +37,13 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 	@Override
 	public void action() {
 
-			System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
-					+ " parse Standardintegrationsprofile to initalize knowledgeBase");
+		System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName() + " parse Standardintegrationsprofile to initalize knowledgeBase");
+		String mtpFileName = this.schedulingAgent.getInternalDataModel().getMtpFileName();
 
-			List<Property> properties = parseJsonList();
-//			for (Property property : properties) {
-//				System.out.println("Name: " + property.getName());
-//				System.out.println("Value: " + property.getValue());
-//				System.out.println("Unit: " + property.getUnit());
-//				System.out.println("Description: " + property.getDescription());
-//				System.out.println("----------------------");
-//			}
+			//Get Properties by Parsing Standardintegrationprofile and save in List
+			List<Property> properties = parseJsonList(mtpFileName);
 
+			//Initialize knowledge base with values from the standard integration profile
 			for (Property property : properties) {
 				switch (property.getName()) {
 				case "Stack-Power":
@@ -69,8 +65,9 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 						Object value = property.getValue();
 						if (value instanceof String) {
 							this.schedulingAgent.getInternalDataModel().setCapEx(Double.parseDouble((String) value));
-							System.out.println("CapEx successfully initialized");
+							System.out.println("CapEx of " + Double.parseDouble((String) value) +  "€ successfully initialized");
 						} else {
+							
 							System.err.println("Error: Property 'CapEx' is not a String");
 						}
 					} catch (NumberFormatException e) {
@@ -190,13 +187,11 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 							}.getType();
 							List<ProductionCurveData> productionCurveDataList = gson.fromJson(json, listType);
 							
-							System.out.println("Print Production Curve");
-							
-							for (ProductionCurveData data : productionCurveDataList) {
-							    System.out.println("X: " + data.getX());
-							    System.out.println("Y: " + data.getY());
-							    System.out.println("----------------------");}
 
+							/**
+							 * The code for the automated generation of the quadratic regression based on the data points of the hydrogen production curve is listed below 
+							 */
+							
 							// Data points of the hydrogen production curve 
 				            double[] utilization = productionCurveDataList.stream().mapToDouble(ProductionCurveData::getX).toArray();
 				            double[] productionRate = productionCurveDataList.stream().mapToDouble(ProductionCurveData::getY).toArray();
@@ -249,42 +244,55 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 		}
 
 	
-	public static List<Property> parseJsonList() {
-        List<Property> properties = new ArrayList<>();
+	public static List<Property> parseJsonList(String mtpFileName) {
+		List<Property> properties = new ArrayList<>();
 
-        String zipFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Enapter MTPs\\EnapterElectrolyser_extended.mtp";
-        String jsonFileName = "Integrationprofile.json";
+		// FilePath of the MTP database
+		String zipDirectoryPath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Enapter MTPs";
 
-        try (InputStream fis = Files.newInputStream(Paths.get(zipFilePath));
-             ZipInputStream zis = new ZipInputStream(fis)) {
+		//Create complete path to the MTP file
+		String zipFilePath = Paths.get(zipDirectoryPath, mtpFileName).toString();
+		String jsonFileName = "Integrationprofile.json";
+		
+		File mtpFile = new File(zipFilePath);
 
-            ZipEntry zipEntry;
-            while ((zipEntry = zis.getNextEntry()) != null) {
-                if (zipEntry.getName().equals(jsonFileName)) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = zis.read(buffer)) > 0) {
-                        baos.write(buffer, 0, len);
-                    }
+		//Check, if MTP-File exists
+		if (mtpFile.exists()) {
+			try (InputStream fis = Files.newInputStream(Paths.get(zipFilePath));
+					ZipInputStream zis = new ZipInputStream(fis)) {
 
-                    String jsonString = baos.toString();
-                    Gson gson = new GsonBuilder().create();
+				ZipEntry zipEntry;
+				while ((zipEntry = zis.getNextEntry()) != null) {
+					if (zipEntry.getName().equals(jsonFileName)) {
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						byte[] buffer = new byte[1024];
+						int len;
+						while ((len = zis.read(buffer)) > 0) {
+							baos.write(buffer, 0, len);
+						}
 
-                    StandardIntegrationProfile profile = gson.fromJson(jsonString,
-                            StandardIntegrationProfile.class);
+						String jsonString = baos.toString();
+						Gson gson = new GsonBuilder().create();
 
-                    // Zugriff auf die Eigenschaften des geparsten Objekts
-                    properties.addAll(profile.getProperties());
-                    break; // Wir haben die Datei gefunden, also beenden wir die Schleife
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+						StandardIntegrationProfile profile = gson.fromJson(jsonString,
+								StandardIntegrationProfile.class);
 
-        return properties;
-    }
+						// Access to the properties of the parsed object
+						properties.addAll(profile.getProperties());
+						break;
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("Error: MTP file not found - " + zipFilePath);
+		}
+
+		return properties;
+	}
+	
+	
 	
 	//Code for quadratic Approximation of production curve
 	private static PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
@@ -334,6 +342,4 @@ public class initializeKnowledgebase extends OneShotBehaviour {
         }
         return result;
     }
-	
-	
 }

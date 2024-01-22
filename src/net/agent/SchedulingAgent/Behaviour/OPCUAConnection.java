@@ -60,7 +60,7 @@ public class OPCUAConnection extends OneShotBehaviour {
 //			configPoint = EndpointUtil.updateUrl(endpoints.get(0), "139.11.207.61", 8001);
 			
 			cfg.setEndpoint(configPoint);
-			// cfg.setIdentityProvider(new UsernameProvider("admin", "wago")); //set Password, if necessary
+			// cfg.setIdentityProvider(new UsernameProvider("admin", "xx")); //set Password, if necessary
 
 			// Store the OPC UA information in the internal data model
 			this.schedulingAgent.getInternalDataModel().setEndpoints(endpoints);
@@ -68,7 +68,7 @@ public class OPCUAConnection extends OneShotBehaviour {
 			this.schedulingAgent.getInternalDataModel().getCfg().setEndpoint(configPoint);
 
 			// Connect to client
-			System.out.println("Agent:" + this.schedulingAgent.getLocalName() + "connect to OPC-UA PEA-Server");
+			System.out.println("PEA-Agent:" + this.schedulingAgent.getLocalName() + "connect to OPC-UA MTP-Server");
 			client = OpcUaClient.create(cfg.build());
 			client.connect().get();
 			addressSpace = client.getAddressSpace();

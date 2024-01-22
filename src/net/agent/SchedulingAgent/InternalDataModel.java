@@ -43,6 +43,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private double ProductionCoefficientB;
 	private double ProductionCoefficientC;
 	private int startUpDuration; 
+	private String mtpFileName;
 	
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
@@ -58,13 +59,16 @@ public class InternalDataModel extends AbstractUserObject {
 	private boolean stateIdle;
 	
 	// Information within MAS 
-	private int numberofAgents = 3; 
+	private int numberofAgents; 
 	private double sumProduction;
 	private int CountReceivedMessages = 0;
 	private boolean enableMessageReceive = false; // is set in Dual Update
 	private boolean receiveMessages = true;
 	private Map<Integer, Map<Integer, Double>> listReceivedProductionQuantities;
+	//List for lowerOperatingLimits
 	private Map<Integer, List<Boolean>> listReceivedLowerOperatingLimits;
+	//List for upperOperatingLimits
+	private Map<Integer, List<Boolean>> listReceivedUpperOperatingLimits;
 	private int rowIndexShutdownOrder = 0;
 	private ArrayList<Integer> shutdownOrderList = new ArrayList<Integer>();
 
@@ -138,6 +142,14 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	// ---- Getter & Setter ----
+	
+	public String getMtpFileName() {
+		return mtpFileName;
+	}
+
+	public void setMtpFileName(String mtpFileName) {
+		this.mtpFileName = mtpFileName;
+	}
 	
 	public String getEndpointURL() {
 		return endpointURL;
@@ -223,6 +235,10 @@ public class InternalDataModel extends AbstractUserObject {
 		this.periodShutdown = periodShutdown;
 	}
 	
+	/**
+	 * List for Received LowerOperatingLimits
+	 */
+	
 	public Map<Integer, List<Boolean>> getListReceivedLowerOperatingLimits() {
 		return listReceivedLowerOperatingLimits;
 	}
@@ -248,7 +264,7 @@ public class InternalDataModel extends AbstractUserObject {
 	    }
     
 	// Method to check whether all Boolean values for an iteration are true
-		public boolean checkAllTrueForIteration(int iteration) {
+		public boolean lowerLimitsAllTrueForIteration(int iteration) {
 			   if (listReceivedLowerOperatingLimits == null ) {
 				   listReceivedLowerOperatingLimits = new HashMap<>();
 			}
@@ -277,6 +293,66 @@ public class InternalDataModel extends AbstractUserObject {
 	            System.out.println("Iteration: " + iteration + ", Values: " + values);
 	        }
 	    }
+	    
+		/**
+		 * List for Received UpperOperatingLimits
+		 */
+		
+		public Map<Integer, List<Boolean>> getListReceivedUpperOperatingLimits() {
+			return listReceivedUpperOperatingLimits;
+		}
+
+		public void setListReceivedUpperOperatingLimits(Map<Integer, List<Boolean>> listReceivedUpperOperatingLimits) {
+			this.listReceivedUpperOperatingLimits = listReceivedUpperOperatingLimits;
+		}
+		
+		
+		// Method for entering a Boolean value for a specific iteration
+		   public void addUpperOperatingLimit(int iteration, boolean value) {
+			   if (listReceivedUpperOperatingLimits == null ) {
+				   listReceivedUpperOperatingLimits = new HashMap<>();
+			}
+			   
+			   // Check whether there is already a list for the iteration
+		        if (!listReceivedUpperOperatingLimits.containsKey(iteration)) {
+		            listReceivedUpperOperatingLimits.put(iteration, new ArrayList<>());
+		        }
+
+		     // Add the value to the list
+		        listReceivedUpperOperatingLimits.get(iteration).add(value);
+		    }
+	    
+		// Method to check whether all Boolean values for an iteration are true
+			public boolean upperLimitsAllTrueForIteration(int iteration) {
+				   if (listReceivedUpperOperatingLimits == null ) {
+					   listReceivedUpperOperatingLimits = new HashMap<>();
+				}
+				List<Boolean> values = listReceivedUpperOperatingLimits.get(iteration);
+				// If there is no list for the iteration or the list is empty
+				if (values == null || values.isEmpty()) {
+					return false;
+				}
+
+				// Überprüfe, ob alle Werte in der Liste true sind
+				for (boolean value : values) {
+					if (!value) {
+						return false;
+					}
+				}
+
+				return true;
+			}
+	    
+		 // Method for outputting all values of lower operating values
+		    public void printAllUpperOperatingLimitValues() {
+		        for (Map.Entry<Integer, List<Boolean>> entry : listReceivedUpperOperatingLimits.entrySet()) {
+		            int iteration = entry.getKey();
+		            List<Boolean> values = entry.getValue();
+
+		            System.out.println("Iteration: " + iteration + ", Values: " + values);
+		        }
+		    }
+	    
 	
 	// Method to add received production quantity for a specific period and iteration
 	public void addReceivedProductionQuantity(int period, int iteration, double quantity) {

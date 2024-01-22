@@ -10,11 +10,11 @@ import java.sql.Statement;
 import net.agent.DSMInformation.DSMInformation;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
-public class JdbcDatabaseConnector {
+public class SQLDatabaseConnector {
 
 	SchedulingAgent schedulingAgent;
 
-	public JdbcDatabaseConnector(SchedulingAgent schedulingAgent) {
+	public SQLDatabaseConnector(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
 

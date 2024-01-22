@@ -10,9 +10,10 @@ import net.agent.SchedulingAgent.Behaviour.initializeKnowledgebase;
 public class SchedulingAgent extends Agent {
 	
     // Constructor with additional parameter for the endpoint URL and name of the MTP
-    public SchedulingAgent(String endpointUrl, String MTPname, int numberofAgents) {
+    public SchedulingAgent(String endpointUrl, String mtpFileName, int numberofAgents) {
         this.getInternalDataModel().setEndpointURL(endpointUrl);
         this.getInternalDataModel().setNumberofAgents(numberofAgents);
+        this.getInternalDataModel().setMtpFileName(mtpFileName);
     }
 
 	private static final long serialVersionUID = 1L;
@@ -38,7 +39,6 @@ public class SchedulingAgent extends Agent {
 		initializeKnowledgebase initializeKnowledgebase = new initializeKnowledgebase(this);
 		this.addBehaviour(initializeKnowledgebase);
 		
-
 		//Connect to Low-Level Controller via OPC-UA
 //		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
 //		this.addBehaviour(opcuaConnection);

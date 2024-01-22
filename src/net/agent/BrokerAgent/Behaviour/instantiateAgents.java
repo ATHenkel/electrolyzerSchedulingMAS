@@ -35,7 +35,8 @@ public class instantiateAgents extends OneShotBehaviour {
 	public void action() {
 		
 		//Get TopologyFile
-		String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Electrolysis\\Topology\\topology1.mtd";
+//		String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Electrolysis\\Topology\\topology1.mtd"; 		//Old TopologyFile
+		String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\08_Veröffentlichungen\\2024\\Energies\\2024-01-18 ElectrolysisPlant\\Topology\\ElectrolysisPlant.mtd";
 		List<Module> modules = parseTopologyFile(topologyFilePath);
 		this.brokerAgent.getInternalDataModel().setModules(modules);
 
@@ -45,8 +46,8 @@ public class instantiateAgents extends OneShotBehaviour {
 			Module module = iterator.next();
 			
 			//Identify PEA types via DeviceClass of the PEAInformationLabel in the MTP
-			String amlFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Electrolysis\\MTP Lib\\"
-					+ module.visibleName + ".aml";
+			String amlFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\08_Veröffentlichungen\\2024\\Energies\\2024-01-18 ElectrolysisPlant\\MTP Lib\\"
+			+ module.visibleName + ".aml";
 
 			if (new File(amlFilePath).exists()) {
 				//Check, if Module is an electrolyser 
@@ -69,18 +70,24 @@ public class instantiateAgents extends OneShotBehaviour {
 
 		// Create a list of scheduling agents
 		List<SchedulingAgent> agentList = new ArrayList<>();
+		
+		//Get Number of PEA-Agents
+		int numberofAgents = modules.size();
 
 		// Iterate over the number of agents and instantiate scheduling agents
-		// TODO: Hier eigentlich modules.size() verwenden --> modules.size =numberofAgents
-		for (int i = 1; i <= 3; i++) {
+		for (int i = 0; i <= numberofAgents-1; i++) {
 			try {
-				SchedulingAgent schedulingAgent = new SchedulingAgent("endpoint", "MTPName", 3); //TODO: Hier noch number of Agents ergänzen (module.size verwenden)
-				System.out.println("Endpoint-URL von Modul 1: " + modules.get(0).endpointUrl);
+				//Get current Module
+				Module currentModule = modules.get(i);
+				
+				//Add .mtp extension to the MTP file
+				String mtpFileName = currentModule.visibleName + ".mtp";
+				SchedulingAgent schedulingAgent = new SchedulingAgent("endpoint", mtpFileName, numberofAgents); 
 				// Add the agent to the list
 				agentList.add(schedulingAgent);
 
 				// Output
-				System.out.println("PEA-agent " + i + " was instantiated.");
+				System.out.println("PEA-agent " + (i+1) + " was instantiated.");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

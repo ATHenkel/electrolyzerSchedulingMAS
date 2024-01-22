@@ -32,7 +32,8 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 				int msgIteration = Integer.parseInt(parts[0]);
 				double msgProductionQuantity = Double.parseDouble(parts[1]);
 				boolean msgLowerOperatingLimit = Boolean.parseBoolean(parts[2]);
-				int msgRowIndexShutdownOrder = Integer.parseInt(parts[3]);
+				boolean msgUpperOperatingLimit = Boolean.parseBoolean(parts[3]);
+				int msgRowIndexShutdownOrder = Integer.parseInt(parts[4]);
 				
 				//Check whether the row index of the agent differs from the received row index 
 				if (msgRowIndexShutdownOrder != rowIndexShutdownOrder) {
@@ -47,6 +48,9 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 					
 					//Add Lower Operating Limit to List
 					this.schedulingAgent.getInternalDataModel().addLowerOperatingLimit(iteration, msgLowerOperatingLimit);
+				
+					//Add Upper Operating Limit to List
+					this.schedulingAgent.getInternalDataModel().addUpperOperatingLimit(iteration, msgUpperOperatingLimit);
 					
 				} else if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() > 0) {
 					//Sum up production quantities
@@ -55,6 +59,9 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 					
 					//Add Lower Operating Limit to List
 					this.schedulingAgent.getInternalDataModel().addLowerOperatingLimit(iteration, msgLowerOperatingLimit);
+					
+					//Add Upper Operating Limit to List
+					this.schedulingAgent.getInternalDataModel().addUpperOperatingLimit(iteration, msgUpperOperatingLimit);
 				}
 
 				// Increase Message Counter

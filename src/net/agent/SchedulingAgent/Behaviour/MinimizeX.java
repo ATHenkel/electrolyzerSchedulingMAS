@@ -77,6 +77,7 @@ public class MinimizeX extends OneShotBehaviour {
 		int rowIndexShutdownOrder = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
 		int nextShutdownElectrolyzer = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(rowIndexShutdownOrder);
 		int startUpDuration = this.schedulingAgent.getInternalDataModel().getStartUpDuration();
+		boolean stateProduction = this.schedulingAgent.getInternalDataModel().isStateProduction();
 		
 		// Parameters for Solving
 		double min_mLCOHLambda = Double.POSITIVE_INFINITY;
@@ -95,7 +96,7 @@ public class MinimizeX extends OneShotBehaviour {
 		
 		//--- Standby Check ---
 		//Check, if all Electrolyzers are working at lower operating Limit 
-		if (this.schedulingAgent.getInternalDataModel().checkAllTrueForIteration(currentIteration-1)) {
+		if (this.schedulingAgent.getInternalDataModel().lowerLimitsAllTrueForIteration(currentIteration-1)) {
 			
 			//Check, if this electrolyzer should be shutdown 
 			if (agentId == nextShutdownElectrolyzer) {
@@ -121,7 +122,6 @@ public class MinimizeX extends OneShotBehaviour {
 		}
 		
 		// Check whether the electrolyzer is in production mode
-		boolean stateProduction = this.schedulingAgent.getInternalDataModel().isStateProduction();
 		if (stateProduction) {
 			// Loop over the range of values of the realizable load of the electrolyzer
 			for (double x = minPower; x < this.schedulingAgent.getInternalDataModel().getMaxPower(); x += increment) {

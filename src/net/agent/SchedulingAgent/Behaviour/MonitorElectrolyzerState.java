@@ -60,7 +60,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
     @Override
     protected void onTick() {
     	
-    	//Initialize the values for setpoint and demand
+    	//Initialize the values for operating point and demand
 		double setpoint = 0;
 		double demand = 0;
 		
