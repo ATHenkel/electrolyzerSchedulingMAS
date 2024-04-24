@@ -27,6 +27,18 @@ public class OPCUAConnection extends OneShotBehaviour {
 	@Override
 	public void action() {
 		
+    	//Get Agent-ID as Integer
+		String localName = this.schedulingAgent.getLocalName();
+		int agentId;
+		try {
+			agentId = Integer.parseInt(localName);
+		} catch (NumberFormatException e) {
+			agentId = -1; // Default value if the conversion fails.
+		}
+		
+		//TODO: OPC UA Connection for Agent 1 and 3
+		if (agentId == 1 || agentId == 3){
+			
 		// Internal Data Model
 		List<EndpointDescription> endpoints = this.schedulingAgent.getInternalDataModel().getEndpoints();
 		EndpointDescription configPoint = this.schedulingAgent.getInternalDataModel().getConfigPoint();
@@ -55,10 +67,6 @@ public class OPCUAConnection extends OneShotBehaviour {
 			endpoints = DiscoveryClient.getEndpoints(endpointURL).get(); 
 			configPoint = EndpointUtil.updateUrl(endpoints.get(0), host, port);
 			
-			//TODO: Check, ob alte Version gelöscht werden kann:
-//			endpoints = DiscoveryClient.getEndpoints("opc.tcp://139.11.207.61:8001").get(); 
-//			configPoint = EndpointUtil.updateUrl(endpoints.get(0), "139.11.207.61", 8001);
-			
 			cfg.setEndpoint(configPoint);
 			// cfg.setIdentityProvider(new UsernameProvider("admin", "xx")); //set Password, if necessary
 
@@ -82,5 +90,5 @@ public class OPCUAConnection extends OneShotBehaviour {
 		MonitorElectrolyzerState monitorElectrolyzerState = new MonitorElectrolyzerState(schedulingAgent);
 		this.schedulingAgent.addBehaviour(monitorElectrolyzerState);
 	}
-
+	}
 }

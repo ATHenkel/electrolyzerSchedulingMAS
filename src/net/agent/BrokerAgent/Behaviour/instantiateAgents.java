@@ -35,8 +35,9 @@ public class instantiateAgents extends OneShotBehaviour {
 	public void action() {
 		
 		//Get TopologyFile
-//		String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Electrolysis\\Topology\\topology1.mtd"; 		//Old TopologyFile
-		String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\08_Veröffentlichungen\\2024\\Energies\\2024-01-18 ElectrolysisPlant\\Topology\\ElectrolysisPlant.mtd";
+		//String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\08_Veröffentlichungen\\2024\\Energies\\2024-01-18 ElectrolysisPlant\\Topology\\ElectrolysisPlant.mtd";
+		String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
+		
 		List<Module> modules = parseTopologyFile(topologyFilePath);
 		this.brokerAgent.getInternalDataModel().setModules(modules);
 
@@ -46,7 +47,7 @@ public class instantiateAgents extends OneShotBehaviour {
 			Module module = iterator.next();
 			
 			//Identify PEA types via DeviceClass of the PEAInformationLabel in the MTP
-			String amlFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\08_Veröffentlichungen\\2024\\Energies\\2024-01-18 ElectrolysisPlant\\MTP Lib\\"
+			String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\MTP Lib\\"
 			+ module.visibleName + ".aml";
 
 			if (new File(amlFilePath).exists()) {
@@ -82,7 +83,7 @@ public class instantiateAgents extends OneShotBehaviour {
 				
 				//Add .mtp extension to the MTP file
 				String mtpFileName = currentModule.visibleName + ".mtp";
-				SchedulingAgent schedulingAgent = new SchedulingAgent("endpoint", mtpFileName, numberofAgents); 
+				SchedulingAgent schedulingAgent = new SchedulingAgent(currentModule.endpointUrl, mtpFileName, numberofAgents); 
 				// Add the agent to the list
 				agentList.add(schedulingAgent);
 

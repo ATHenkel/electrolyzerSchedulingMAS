@@ -29,8 +29,10 @@ public class SchedulingDone extends OneShotBehaviour {
 
 		List<IterationADMM> iterationADMMTable = this.schedulingAgent.getInternalDataModel().getIterationADMMTable();
 
+		this.schedulingAgent.getInternalDataModel().setReceiveMessages(true);
+		
 		if (agentId == 1) {
-			System.out.println("Iteration-ADMM-Table für Agenten 1");
+		//	System.out.println("Iteration-ADMM-Table für Agenten 1");
 			// print all values from Iteration ADMM table
 			for (IterationADMM iteration : iterationADMMTable) {
 				int period = iteration.getPeriod();
@@ -39,18 +41,14 @@ public class SchedulingDone extends OneShotBehaviour {
 				double energyDemand = iteration.getEnergyDemand();
 				double mLCOH = iteration.getmLCOH();
 				double x = iteration.getX();
-
+				
 				// Format in table
 				String formattedOutput = String.format(
 						"Period: %d | Iteration: %d | Production Quantity: %.2f | Energy Demand: %.2f | mLCOH: %.2f | x: %.2f",
 						period, iterationNumber, productionQuantity, energyDemand, mLCOH, x);
 
-				System.out.println(formattedOutput);
+			//	System.out.println(formattedOutput);
 			}
-			
-			myAgent.removeBehaviour(this); // Agent shouldnt die
-
 		}
-
 	}
 }

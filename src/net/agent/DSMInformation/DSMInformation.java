@@ -36,24 +36,44 @@ public class DSMInformation {
 		return externalInformation.get(lastId);
 	}
 
-	// Method to get demand for a specific period
-	public Double getDemandForPeriod(int timestep) {
-		DSMData dsmData = externalInformation.get(timestep);
-		if (dsmData != null) {
-			return dsmData.getDemand();
-		} else {
-			return null; // Period not found
-		}
+	// Method to obtain the electricity price for a specific time period
+	public Double getElectricityPriceForPeriod(int timestep) {
+	    Integer id = findIdForTimestep(timestep);
+	    if (id != null && externalInformation.containsKey(id)) {
+	        return externalInformation.get(id).getElectricityPrice();
+	    } else {
+	        return null; // Period not found
+	    }
 	}
 
-	// Method to get electricityPrice for a specific period
-	public Double getElectricityPriceForPeriod(int timestep) {
-		DSMData dsmData = externalInformation.get(timestep);
-		if (dsmData != null) {
-			return dsmData.getElectricityPrice();
-		} else {
-			return null; // Period not found
-		}
+	// Method to obtain the demand for a specific time period
+	public Double getDemandForPeriod(int timestep) {
+	    Integer id = findIdForTimestep(timestep);
+	    if (id != null && externalInformation.containsKey(id)) {
+	        return externalInformation.get(id).getDemand();
+	    } else {
+	        return null; // Period not found
+	    }
+	}
+	
+	// Method to obtain the production quantity for a specific period
+	public Double getProductionQuantityForPeriod(int timestep) {
+	    Integer id = findIdForTimestep(timestep);
+	    if (id != null && externalInformation.containsKey(id)) {
+	        return externalInformation.get(id).getProductionQuantity();
+	    } else {
+	        return null; // Period not found
+	    }
+	}
+
+	//Auxiliary method to get timestep
+	private Integer findIdForTimestep(int timestep) {
+	    for (Map.Entry<Integer, DSMData> entry : externalInformation.entrySet()) {
+	        if (entry.getValue().getTimestep() == timestep) {
+	            return entry.getKey();
+	        }
+	    }
+	    return null; // Keine ID für den angegebenen Timestep gefunden
 	}
 
 	// Method to get the last timestep for all values
@@ -154,5 +174,6 @@ public class DSMInformation {
 		public void setTimestep(int timestep) {
 			this.timestep = timestep;
 		}
+		
 	}
 }

@@ -19,6 +19,15 @@ public class SQLDatabaseConnector {
 	}
 
 	public void readDataFromDatabase() {
+		
+	   	//Get Agent-ID as Integer
+			String localName = this.schedulingAgent.getLocalName();
+			int agentId;
+			try {
+				agentId = Integer.parseInt(localName);
+			} catch (NumberFormatException e) {
+				agentId = -1; // Default value if the conversion fails.
+			}
 
 		// Get Internal DataBase to store information from SQL-DB
 		DSMInformation dsmInformation = schedulingAgent.getInternalDataModel().getDSMInformation();
@@ -45,7 +54,7 @@ public class SQLDatabaseConnector {
 				double productionQuantity = resultSet.getDouble("productionquantity");
 				double tanklevel = resultSet.getDouble("tanklevel");
 				int timestep = resultSet.getInt("timestep");
-
+				
 				// Add Values to dsminformation table
 				dsmInformation.addExternalDSMInformation(id, demand, electricityPrice, powerIn, productionQuantity,
 						tanklevel, timestep);
@@ -54,6 +63,7 @@ public class SQLDatabaseConnector {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 	}
 
 	public void insertDataIntoPeasData(int id, double efficiency, double lowerOperatingLimit, double productionRate,

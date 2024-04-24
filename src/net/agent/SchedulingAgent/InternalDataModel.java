@@ -29,6 +29,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private AddressSpace addressSpace;
 	private int schedulingResultNextPeriod = 1; //Defines the period with which the PLC was last communicated the scheduling results
 	private boolean headerWritten = true; //Boolean variable to make sure that header will be written only 1x 
+	private int counter;
 	
 	// External Parameters
 	private double CapEx; // Capital-Costs in €
@@ -47,7 +48,7 @@ public class InternalDataModel extends AbstractUserObject {
 	
 	// ADMM - Lagrange Multiplicators
 	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
-	private double penaltyFactor = 0.17; // Penalty-Term (Value: 0.2)
+	private double penaltyFactor = 0; // Penalty-Term (Value: 0.2)
 	private int iteration = 0; // Iteration
 	private double epsilonProduction = 0.002; // Tolerable deviation from the required production quantity (Value: 0.0005 (fast convergence))
 	private int currentPeriod = 1;
@@ -71,6 +72,8 @@ public class InternalDataModel extends AbstractUserObject {
 	private Map<Integer, List<Boolean>> listReceivedUpperOperatingLimits;
 	private int rowIndexShutdownOrder = 0;
 	private ArrayList<Integer> shutdownOrderList = new ArrayList<Integer>();
+	private boolean reschedulingActivated;
+	private int reschedulingPeriod;
 
 	// Variables
 	private double x; // Cost optimal Utilization of the electrolyzer
@@ -143,6 +146,34 @@ public class InternalDataModel extends AbstractUserObject {
 
 	// ---- Getter & Setter ----
 	
+	public int getReschedulingPeriod() {
+		return reschedulingPeriod;
+	}
+
+	public void setReschedulingPeriod(int reschedulingPeriod) {
+		this.reschedulingPeriod = reschedulingPeriod;
+	}
+	
+	public boolean isReschedulingActivated() {
+		return reschedulingActivated;
+	}
+
+	public void setReschedulingActivated(boolean reschedulingActivated) {
+		this.reschedulingActivated = reschedulingActivated;
+	}
+	
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
+	
+	public void incrementCounter() {
+		this.counter = counter+1;
+	}
+	
 	public String getMtpFileName() {
 		return mtpFileName;
 	}
@@ -179,14 +210,15 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 	
 	public void updateShutdownOrderIndex() {
-		shutdownOrderList = getShutdownOrderList();
+	    shutdownOrderList = getShutdownOrderList();
 	    if (shutdownOrderList != null && !shutdownOrderList.isEmpty()) {
 	        rowIndexShutdownOrder = (rowIndexShutdownOrder + 1) % shutdownOrderList.size();
+	        System.out.println("Updated rowIndexShutdownOrder to: " + rowIndexShutdownOrder);
 	    } else {
-	        System.err.println("The shutdown order list is zero or empty.");
+	        System.err.println("The shutdown order list is zero or empty. Cannot update index.");
 	    }
 	}
-	
+
 	
 	public ArrayList<Integer> getShutdownOrderList() {
 		return shutdownOrderList;
@@ -205,11 +237,9 @@ public class InternalDataModel extends AbstractUserObject {
 	    }
 	}
 
-
 	public void setShutdownOrderList(ArrayList<Integer> shutdownOrderList) {
 		this.shutdownOrderList = shutdownOrderList;
 	}
-	
 	
 	public int getEarliestStartPeriod() {
 		return earliestStartPeriod;
@@ -401,12 +431,23 @@ public class InternalDataModel extends AbstractUserObject {
 		}
 		return -1; 
 	}
-
+	
+    public void resetProductionQuantities() {
+        for (IterationADMM iterationADMM : iterationADMMTable) {
+            iterationADMM.setProductionQuantity(0);
+        }
+    }
+    
 	//Method for adding values to ADMMTable 
 	public void addIterationADMMInfo(int period, int iteration, double productionQuantity, double energyDemand, double x, double z, double mLCOH) {
 		IterationADMM info = new IterationADMM(period, iteration, productionQuantity, energyDemand, x, z, mLCOH);
 		iterationADMMTable.add(info);
 	}
+	
+	 // Method for deleting all values in iterationADMMTable
+    public void clearIterationADMMTable() {
+        iterationADMMTable.clear();
+    }
 	
 	public int getNumberofAgents() {
 		return numberofAgents;

@@ -39,7 +39,7 @@ public class SchedulingResults {
         return -1; // Return -1 or handle it differently if the map is empty
     }
     
-    public void printOptimizationResults() {
+    public void printSchedulingResults() {
         // Überprüfen Sie, ob Optimierungsergebnisse vorhanden sind
         if (results.isEmpty()) {
             System.out.println("Keine Optimierungsergebnisse gefunden.");

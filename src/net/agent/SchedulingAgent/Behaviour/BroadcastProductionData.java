@@ -29,30 +29,31 @@ public class BroadcastProductionData extends OneShotBehaviour {
 		int rowIndexShutdownOrder = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
 		
 		//Check if lower Operating Limit is reached, set boolean to true
-		 if (Math.abs(x - minPower) < tolerancePower)
+		 if (Math.abs(x - minPower) < tolerancePower || this.schedulingAgent.getInternalDataModel().isStateProduction() == false)
 		 {
 			 lowerOperatingLimitReached = true;
 		 }
 		 
-		 //TODO: Hier weiter dran arbeiten 
 			//Check if upper Operating Limit is reached, set boolean to true
-		 if (Math.abs(x - maxPower) <= 0.01 && currentIteration > 10)
+		 if (Math.abs(x - maxPower) <= 0.01 && currentIteration > 10 || this.schedulingAgent.getInternalDataModel().isStateProduction() == false)
 		 {
 			 upperOperatingLimitReached = true;
 		 }
-		
-	    // Convert currentIteration and productionQuantity into a text format
+	 
+ 	    // Convert currentIteration and productionQuantity into a text format
 	    String currentIterationStr = Integer.toString(currentIteration);
 	    String productionQuantityStr = Double.toString(productionQuantity);
 	    String lowerOperatingLimitReachedStr = Boolean.toString(lowerOperatingLimitReached);
 	    String upperOperatingLimitReachedStr = Boolean.toString(upperOperatingLimitReached);
 	    String rowIndexShutdownOrderStr = Integer.toString(rowIndexShutdownOrder);
+ 	    String errorElectrolyzerStr = Boolean.toString(false); //Dummy Values
+	    String periodErrorStr = Integer.toString(-1); //Dummy Values
    
 		List<AID> temporaryPhoneBook = this.schedulingAgent.getInternalDataModel().getPhoneBook();
 		AID myAID = this.schedulingAgent.getAID();
 
 	    // Separate the two values in the message using separators
-	    String content = currentIterationStr + "," + productionQuantityStr + "," + lowerOperatingLimitReachedStr + "," + upperOperatingLimitReachedStr + "," + rowIndexShutdownOrderStr;
+	    String content = currentIterationStr + "," + productionQuantityStr + "," + lowerOperatingLimitReachedStr + "," + upperOperatingLimitReachedStr + "," + rowIndexShutdownOrderStr + "," + errorElectrolyzerStr + "," + periodErrorStr;
 	  
 		for (int i = 0; i < temporaryPhoneBook.size(); i++) {
 			AID receiverAID = temporaryPhoneBook.get(i);

@@ -40,14 +40,17 @@ public class GatherProductionData extends OneShotBehaviour {
 		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 		double epsilonProduction = this.schedulingAgent.getInternalDataModel().getEpsilonProduction();
 		double productionQuantity = this.schedulingAgent.getInternalDataModel().getProductionQuantityForPeriodAndIteration(currentPeriod, currentIteration); // own Production
-		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getDemandForPeriod(currentPeriod);
+		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);
 		double demandDeviation = productionQuantity + sumProduction - demand;
 		boolean allUpperOperatingLimit = this.schedulingAgent.getInternalDataModel().upperLimitsAllTrueForIteration(currentIteration-1);
+		
+		System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Period:" + currentPeriod + " Iteration:" + currentIteration + " DemandDeviation:" + demandDeviation);
 	
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;
 			System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode "
 					+ this.schedulingAgent.getInternalDataModel().getCurrentPeriod() + " Iteration: "
+	
 					+ this.schedulingAgent.getInternalDataModel().getIteration() + " scheduled " + " Demand Deviation: "
 					+ demandDeviation);
 			//Reset Iteration 
@@ -55,12 +58,12 @@ public class GatherProductionData extends OneShotBehaviour {
 		}
 		
 		// Production target not reachable (demandDeviation < 0) and all PEA-agents are producing at the upper limit
-		if(demandDeviation < 0 &&  allUpperOperatingLimit){
+		if(demandDeviation < 0 &&  allUpperOperatingLimit ){
 	    periodScheduled = true;
 		System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode "
 				+ this.schedulingAgent.getInternalDataModel().getCurrentPeriod() + " Iteration: "
 				+ this.schedulingAgent.getInternalDataModel().getIteration() + " ProductionTarget Unreachable " + " Demand Deviation: "
-				+ demandDeviation);
+				+ demandDeviation + "Demand: " + demand) ;
 		//Reset Iteration 
 		this.schedulingAgent.getInternalDataModel().setIteration(0);
 		}

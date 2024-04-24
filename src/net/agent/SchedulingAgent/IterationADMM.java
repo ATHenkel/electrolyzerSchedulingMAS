@@ -47,6 +47,10 @@ public class IterationADMM {
 		return mLCOH;
 	}
 
+	public void setProductionQuantity(double productionQuantity) {
+	    this.productionQuantity = productionQuantity;
+	}
+	
 	public void setmLCOH(double mLCOH) {
 		this.mLCOH = mLCOH;
 	}

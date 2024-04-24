@@ -4,6 +4,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import net.agent.SchedulingAgent.Behaviour.GetGoalOfProduction;
 import net.agent.SchedulingAgent.Behaviour.MessageReceiveBehaviour;
+import net.agent.SchedulingAgent.Behaviour.MonitorElectrolyzerState;
 import net.agent.SchedulingAgent.Behaviour.OPCUAConnection;
 import net.agent.SchedulingAgent.Behaviour.initializeKnowledgebase;
 
@@ -40,8 +41,8 @@ public class SchedulingAgent extends Agent {
 		this.addBehaviour(initializeKnowledgebase);
 		
 		//Connect to Low-Level Controller via OPC-UA
-//		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-//		this.addBehaviour(opcuaConnection);
+		//OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+		//this.addBehaviour(opcuaConnection);
 
 		//Get Production Goals from DSM 
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
