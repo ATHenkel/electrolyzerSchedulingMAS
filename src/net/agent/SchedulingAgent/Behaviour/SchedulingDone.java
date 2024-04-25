@@ -1,10 +1,8 @@
 package net.agent.SchedulingAgent.Behaviour;
 
-
-import java.util.List;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import jade.core.behaviours.OneShotBehaviour;
-import net.agent.SchedulingAgent.IterationADMM;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
 public class SchedulingDone extends OneShotBehaviour {
@@ -20,35 +18,15 @@ public class SchedulingDone extends OneShotBehaviour {
 		System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " SchedulingDone Activated");
 
 		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
 
-		List<IterationADMM> iterationADMMTable = this.schedulingAgent.getInternalDataModel().getIterationADMMTable();
-
-		this.schedulingAgent.getInternalDataModel().setReceiveMessages(true);
+	    // Format for the current date and time as prefix
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+	    String datePrefix = sdf.format(new Date());
 		
-		if (agentId == 1) {
-		//	System.out.println("Iteration-ADMM-Table für Agenten 1");
-			// print all values from Iteration ADMM table
-			for (IterationADMM iteration : iterationADMMTable) {
-				int period = iteration.getPeriod();
-				int iterationNumber = iteration.getIteration();
-				double productionQuantity = iteration.getProductionQuantity();
-				double energyDemand = iteration.getEnergyDemand();
-				double mLCOH = iteration.getmLCOH();
-				double x = iteration.getX();
-				
-				// Format in table
-				String formattedOutput = String.format(
-						"Period: %d | Iteration: %d | Production Quantity: %.2f | Energy Demand: %.2f | mLCOH: %.2f | x: %.2f",
-						period, iterationNumber, productionQuantity, energyDemand, mLCOH, x);
-
-			//	System.out.println(formattedOutput);
-			}
-		}
+		//Save Scheduling Results as .csv-Data
+		String filepath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\out\\" + datePrefix + "_Agent" + localName + "_SchedulingResults.csv";
+		this.schedulingAgent.getInternalDataModel().getSchedulingResults().saveSchedulingResultsToCSV(filepath);
+		
+		this.schedulingAgent.getInternalDataModel().setReceiveMessages(true);
 	}
 }

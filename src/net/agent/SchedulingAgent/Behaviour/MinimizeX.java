@@ -26,7 +26,6 @@ public class MinimizeX extends OneShotBehaviour {
 
 		// Production Quantity per Year
 		nominalProductionPerYear = nominalProductionPerHour * fullLoadHours;
-
 		return nominalProductionPerYear;
 	}
 
@@ -67,8 +66,7 @@ public class MinimizeX extends OneShotBehaviour {
 		double PEL = this.schedulingAgent.getInternalDataModel().getPEL();
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
 		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
-		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation()
-				.getElectricityPriceForPeriod(currentPeriod);
+		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation().getElectricityPriceForPeriod(currentPeriod);
 		double min_x_value = this.schedulingAgent.getInternalDataModel().getMinPower();
 		double minPower = this.schedulingAgent.getInternalDataModel().getMinPower();
 		double maxPower = this.schedulingAgent.getInternalDataModel().getMaxPower();
@@ -76,15 +74,12 @@ public class MinimizeX extends OneShotBehaviour {
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
 		int lifetime = this.schedulingAgent.getInternalDataModel().getUtilizaziontime();
 		double discountrate = this.schedulingAgent.getInternalDataModel().getDiscountrate();
-		double fullLoadHours = this.schedulingAgent.getInternalDataModel().getLoadFactor() * 8760; // 8760 hours per
-																									// year
+		double fullLoadHours = this.schedulingAgent.getInternalDataModel().getLoadFactor() * 8760; // 8760 hours per year
 		double OMFactor = this.schedulingAgent.getInternalDataModel().getOMFactor();
 		double z = this.schedulingAgent.getInternalDataModel().getZ();
-		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation()
-				.getProductionQuantityForPeriod(currentPeriod);
+		double demand = this.schedulingAgent.getInternalDataModel().getDSMInformation().getProductionQuantityForPeriod(currentPeriod);
 		int rowIndexShutdownOrder = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
-		int nextShutdownElectrolyzer = this.schedulingAgent.getInternalDataModel()
-				.getShutdownOrderValue(rowIndexShutdownOrder);
+		int nextShutdownElectrolyzer = this.schedulingAgent.getInternalDataModel().getShutdownOrderValue(rowIndexShutdownOrder);
 		int startUpDuration = this.schedulingAgent.getInternalDataModel().getStartUpDuration();
 		boolean stateProduction = this.schedulingAgent.getInternalDataModel().isStateProduction();
 
@@ -141,8 +136,9 @@ public class MinimizeX extends OneShotBehaviour {
 		if (stateProduction) {
 			// Loop over the range of values of the realizable load of the electrolyzer
 			for (double x = minPower; x <= maxPower + increment; x += increment) {
+				
+				// Set x to the maximum value if the increment exceeds the maximum
 				if (x > maxPower) {
-					// Set x to the maximum value if the increment exceeds the maximum
 					x = maxPower;
 				}
 
@@ -171,9 +167,8 @@ public class MinimizeX extends OneShotBehaviour {
 		// Returns the X value at which mLCOH is minimum.
 		this.schedulingAgent.getInternalDataModel().setX(min_x_value);
 		this.schedulingAgent.getInternalDataModel().addIterationADMMInfo(
-				this.schedulingAgent.getInternalDataModel().getCurrentPeriod(),
-				this.schedulingAgent.getInternalDataModel().getIteration(), getHourlyProductionQuantity(min_x_value), 0,
-				min_x_value, this.schedulingAgent.getInternalDataModel().getZ(), min_mLCOH);
+		this.schedulingAgent.getInternalDataModel().getCurrentPeriod(),
+		this.schedulingAgent.getInternalDataModel().getIteration(), getHourlyProductionQuantity(min_x_value), 0, min_x_value, this.schedulingAgent.getInternalDataModel().getZ(), min_mLCOH);
 		
 		return min_x_value;
 	}

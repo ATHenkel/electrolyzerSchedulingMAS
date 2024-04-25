@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.mysql.cj.x.protobuf.MysqlxSession.Reset;
-
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
@@ -15,14 +13,16 @@ public class DualUpdate extends OneShotBehaviour {
 
 	SchedulingAgent schedulingAgent;
 
+
 	public DualUpdate(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
 	
+
 	//Write results of current iteration into .csv-file
 	public void writeMatrixToExcel(int AgentID, int Periode, int Iteration, double ownProduction,
 	        double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda,
-	        double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer, double k, boolean stateProduction, boolean stateStandby) {
+	        double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer, boolean stateProduction, boolean stateStandby) {
 		
     	//Get Agent-ID as Integer
 		String localName = this.schedulingAgent.getLocalName();
@@ -44,7 +44,7 @@ public class DualUpdate extends OneShotBehaviour {
 
 	    if (Iteration == 0) {
 	        //Ensure that headline is only created once
-	        header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda;DemandDeviation %; CurrentTime; ShutdownOrderIndex; ShutdownElectrolyzer; k; stateProduction; stateStandby";
+	        header = "Agent;Periode;Iteration;Eigene Produktionsmenge;Empfangene Produktionsmenge;Demand;X;Z;Gradient;Lambda;DemandDeviation %; CurrentTime; ShutdownOrderIndex; ShutdownElectrolyzer; stateProduction; stateStandby";
 	    } else {
 	        header = "";
 	    }
@@ -52,7 +52,7 @@ public class DualUpdate extends OneShotBehaviour {
 	    // Create the data row
 	    data = AgentID + ";" + Periode + ";" + Iteration + ";" + ownProduction + ";" + receivedProductionQuantity + ";"
 	            + Demand + ";" + x + ";" + z + ";" + gradient + ";" + lambda + ";" + demandPercentage + ";"
-	            + currentTimeMs + ";" + shutdownOrderIndex + ";" + shutdownElectrolyzer + ";" + k + ";" + stateProduction + ";" + stateStandby;
+	            + currentTimeMs + ";" + shutdownOrderIndex + ";" + shutdownElectrolyzer + ";" + stateProduction + ";" + stateStandby;
 
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
 	        // If the iteration is 0, write the heading line
@@ -114,14 +114,7 @@ public class DualUpdate extends OneShotBehaviour {
 			agentId = -1; // Default value if the conversion fails.
 		}
 
-		double scalingfactor = 0;
 		if (this.schedulingAgent.getInternalDataModel().isStateProduction()) {
-
-			// Variable k to penalize the deviation between x and z exponentially
-			double delta = Math.abs(x - z);
-			
-			//Scaling factor for Penalty 
-			double k;
 			
 			/**
 			 * Use this Configuration for Enapter AEM EL4.0 Electrolyzer 
@@ -138,44 +131,39 @@ public class DualUpdate extends OneShotBehaviour {
 			}
 			
 			 */
+
+			// Variable k to penalize the deviation between x and z exponentially
+			double delta = Math.abs(x - z);
 			
-			// Limit the exponent to a maximum of 3.5, but only for larger deviations
+			//Scaling factor for Penalty 
+			double k;
+			
 			double limitedExponent;
-			if (delta > 2) {
-				limitedExponent = Math.min(delta, 0.3);
-				k = Math.exp(limitedExponent);
-				penaltyFactor = 0.15;
+			//For larger Deviations
+			if (delta > 0.01) {
+				limitedExponent = 3.7;
+				penaltyFactor = 0.620215;
 			} else {
-				// For small deviations (delta <= 2.0), use a function that grows faster
-				limitedExponent = 1.0 + Math.pow(delta, 0.5);
-				k = 1.1;
-				penaltyFactor = 0.18;
+				// For small deviations
+				limitedExponent = 1.0;
+				penaltyFactor = 0.3;
 			}
-
-			// Calculate the value of Math.exp with the limited exponent
-			scalingfactor = k;
-
+			
+			k = Math.exp(limitedExponent);
 			// double Gradient
 			double gradient = Math.abs(calculateGradientmLCOH(x)) + 0.00001;
 
 			// Only update Lambda if in state Production
 			if (x > 0) {
-				lambda = lambda + penaltyFactor * gradient * (x - z);
+				lambda = lambda + penaltyFactor * (x - z) * gradient * k ;
 			} else {
 				lambda = 0;
 			}
-		
-			
-			
-			
-		
-		
-            
 		}
-
+		
 		// Write Results into .csv-file
-					writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
-							z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown, scalingfactor, this.schedulingAgent.getInternalDataModel().isStateProduction(), this.schedulingAgent.getInternalDataModel().isStateStandby());
+		writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
+							z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown,  this.schedulingAgent.getInternalDataModel().isStateProduction(), this.schedulingAgent.getInternalDataModel().isStateStandby());
 		
 		// Set and reset values
 		this.schedulingAgent.getInternalDataModel().setLambda(lambda);

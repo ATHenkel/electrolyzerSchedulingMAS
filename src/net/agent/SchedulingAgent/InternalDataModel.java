@@ -47,7 +47,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private String mtpFileName;
 	
 	// ADMM - Lagrange Multiplicators
-	private double lambda = 0; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
+	private double lambda = 0.2; // Lagrange-Multiplicator for Demand Constraint (Value 0.0)
 	private double penaltyFactor = 0; // Penalty-Term (Value: 0.2)
 	private int iteration = 0; // Iteration
 	private double epsilonProduction = 0.002; // Tolerable deviation from the required production quantity (Value: 0.0005 (fast convergence))
@@ -218,7 +218,6 @@ public class InternalDataModel extends AbstractUserObject {
 	        System.err.println("The shutdown order list is zero or empty. Cannot update index.");
 	    }
 	}
-
 	
 	public ArrayList<Integer> getShutdownOrderList() {
 		return shutdownOrderList;
@@ -443,6 +442,26 @@ public class InternalDataModel extends AbstractUserObject {
 		IterationADMM info = new IterationADMM(period, iteration, productionQuantity, energyDemand, x, z, mLCOH);
 		iterationADMMTable.add(info);
 	}
+	
+    // Methode, um den x-Wert für eine bestimmte Periode und Iteration zu erhalten
+    public Double getXForIteration(int period, int iteration) {
+        for (IterationADMM admm : iterationADMMTable) {
+            if (admm.getPeriod() == period && admm.getIteration() == iteration) {
+                return admm.getX();
+            }
+        }
+        return null; // Kein Wert gefunden
+    }
+
+    // Methode, um den z-Wert für eine bestimmte Periode und Iteration zu erhalten
+    public Double getZForIteration(int period, int iteration) {
+        for (IterationADMM admm : iterationADMMTable) {
+            if (admm.getPeriod() == period && admm.getIteration() == iteration) {
+                return admm.getZ();
+            }
+        }
+        return null; // Kein Wert gefunden
+    }
 	
 	 // Method for deleting all values in iterationADMMTable
     public void clearIterationADMMTable() {

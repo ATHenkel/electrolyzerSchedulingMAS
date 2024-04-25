@@ -93,7 +93,6 @@ public class Property {
     @Expose
     private String description;
 
-    // Wenn die Eigenschaft "value" eine Liste ist, enthält sie ProductionCurveData-Objekte
     private List<ProductionCurveData> productionCurveData;
 
     public String getName() {

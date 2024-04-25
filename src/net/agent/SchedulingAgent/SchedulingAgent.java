@@ -27,10 +27,9 @@ public class SchedulingAgent extends Agent {
 	public void setInternalDataModel(InternalDataModel internalDataModel) {
 		this.internalDataModel = internalDataModel;
 	}
-
+	
+	// Will be called during instantiation
 	protected void setup() {
-		
-		// Will be called during instantiation
 		
 		//Message Receive behavior, runs cyclically
 		MessageReceiveBehaviour messageReceiveBehaviour = new MessageReceiveBehaviour(this);
@@ -41,8 +40,8 @@ public class SchedulingAgent extends Agent {
 		this.addBehaviour(initializeKnowledgebase);
 		
 		//Connect to Low-Level Controller via OPC-UA
-		//OPCUAConnection opcuaConnection = new OPCUAConnection(this);
-		//this.addBehaviour(opcuaConnection);
+//		OPCUAConnection opcuaConnection = new OPCUAConnection(this);
+//		this.addBehaviour(opcuaConnection);
 
 		//Get Production Goals from DSM 
 		GetGoalOfProduction getGoalOfProduction = new GetGoalOfProduction(this);
