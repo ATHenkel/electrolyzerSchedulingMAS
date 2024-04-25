@@ -35,12 +35,10 @@ public class OpcUaBrowser {
 		this.client = OpcUaClientCreator.createClient(endpointUrl, user, password);	
 		this.client.connect().get();
 		this.nsTable = this.client.getNamespaceTable();
-			
 	}
 
 	/**
 	 * Browse all nodes (recursively) to create the tree structure
-	 * 
 	 * @param browseRoot
 	 * @param parent
 	 * @return

@@ -4,6 +4,10 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
+/**
+ * Handles incoming messages for a scheduling agent, updating operational states
+ * and initiating rescheduling if necessary.
+ */
 public class MessageReceiveBehaviour extends CyclicBehaviour {
 	double sumProduction;
 
@@ -23,9 +27,12 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 		int rowIndexShutdownOrder = this.schedulingAgent.getInternalDataModel().getRowIndexShutdownOrder();
 
 		if (this.schedulingAgent.getInternalDataModel().isReceiveMessages()) {
-
 			ACLMessage receivedMsg = this.schedulingAgent.receive();
-
+			
+			 /**
+		     * Processes received ACLMessage, extracting content and performing actions based on the message data.
+		     * @param receivedMsg The received ACLMessage.
+		     */
 			if (receivedMsg != null) {
 				String content = receivedMsg.getContent();
 				String[] parts = content.split(",");
@@ -44,20 +51,12 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 
 					// Save the period in which a malfunction became known
 					this.schedulingAgent.getInternalDataModel().setReschedulingPeriod(periodError);
+					this.schedulingAgent.getInternalDataModel().setReschedulingActivated(true); // Set Re-Scheduling Activated to true
+					this.schedulingAgent.getInternalDataModel().setSchedulingComplete(false); // Set SchedulingComplete to false
+					this.schedulingAgent.getInternalDataModel().setCurrentPeriod(periodError); // Rescheduling for the period in which the failure was detected
+					this.schedulingAgent.getInternalDataModel().clearIterationADMMTable(); // Clear ADMM-Results
 
-					// Set Re-Scheduling Activated to true
-					this.schedulingAgent.getInternalDataModel().setReschedulingActivated(true);
-
-					// Set SchedulingComplete to false
-					this.schedulingAgent.getInternalDataModel().setSchedulingComplete(false);
-
-					// Rescheduling for the period in which the failure was detected
-					this.schedulingAgent.getInternalDataModel().setCurrentPeriod(periodError);
-
-					// Clear ADMM-Results
-					this.schedulingAgent.getInternalDataModel().clearIterationADMMTable();
-
-					// Behaviour to be executed
+					// Next Behaviour to be executed
 					MinimizeX minimizeX = new MinimizeX(schedulingAgent);
 					this.schedulingAgent.addBehaviour(minimizeX);
 				}
@@ -70,36 +69,26 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 				// Check if no message has been received
 				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == 0) {
 
-					// Add Production Quantity to internal knowledge Base
-					this.schedulingAgent.getInternalDataModel().setSumProduction(msgProductionQuantity);
-				//	System.out.println("Add Procution Quantity at 0 Messages. msgProductionQuantity"  + msgProductionQuantity + " internalDB: " + this.schedulingAgent.getInternalDataModel().getSumProduction() + "period " + period + " iteration " + iteration);
-
-					// Add Lower Operating Limit to List
+					this.schedulingAgent.getInternalDataModel().setSumProduction(msgProductionQuantity); // Add Production Quantity to internal knowledge Base
 					this.schedulingAgent.getInternalDataModel().addLowerOperatingLimit(iteration,
-							msgLowerOperatingLimit);
-
-					// Add Upper Operating Limit to List
+							msgLowerOperatingLimit); // Add Lower Operating Limit to List
 					this.schedulingAgent.getInternalDataModel().addUpperOperatingLimit(iteration,
-							msgUpperOperatingLimit);
+							msgUpperOperatingLimit); // Add Upper Operating Limit to List
 
 				} else if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() > 0) {
-					// Sum up production quantities
 					sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction()
-							+ msgProductionQuantity;
+							+ msgProductionQuantity; // Sum up production quantities
 					this.schedulingAgent.getInternalDataModel().setSumProduction(sumProduction);
-
-					// Add Lower Operating Limit to List
 					this.schedulingAgent.getInternalDataModel().addLowerOperatingLimit(iteration,
-							msgLowerOperatingLimit);
-
-					// Add Upper Operating Limit to List
+							msgLowerOperatingLimit);// Add Lower Operating Limit to List
 					this.schedulingAgent.getInternalDataModel().addUpperOperatingLimit(iteration,
-							msgUpperOperatingLimit);
+							msgUpperOperatingLimit);// Add Upper Operating Limit to List
 				}
 
 				// Increase Message Counter
 				this.schedulingAgent.getInternalDataModel().increaseCountReceivedMessages();
 
+				// Check if all messages from this iteration have been received
 				if (this.schedulingAgent.getInternalDataModel().getCountReceivedMessages() == numberOfAgents - 1
 						&& this.schedulingAgent.getInternalDataModel().getIteration() == msgIteration) {
 

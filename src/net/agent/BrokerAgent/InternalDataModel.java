@@ -1,9 +1,7 @@
 package net.agent.BrokerAgent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.milo.opcua.sdk.client.AddressSpace;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -13,111 +11,105 @@ import agentgui.core.common.AbstractUserObject;
 import jade.core.AID;
 import net.agent.BrokerAgent.Behaviour.instantiateAgents.Module;
 
+/**
+ * Internal data model of Broker-Agent for storing agent configurations and managing shared resources.
+ */
 public class InternalDataModel extends AbstractUserObject {
-	
-	// OPC UA 
-	private OpcUaClient opcUaClient;
-	private List<EndpointDescription> endpoints;
-	private OpcUaClientConfigBuilder cfg;
-	private EndpointDescription configPoint;
-	private AddressSpace addressSpace;
-	
-	//MAS instantiation
-	List<String> validEndpoints; 
-	
-	//MAS information 
-	List<AID> phoneBook;
-	
-	//Module-List
-	List<Module> modules = new ArrayList<>();
-	
-	// ---- Getter & Setter ----
-	
+
+    private OpcUaClient opcUaClient;
+    private List<EndpointDescription> endpoints;
+    private OpcUaClientConfigBuilder cfg;
+    private EndpointDescription configPoint;
+    private AddressSpace addressSpace;
+    private List<String> validEndpoints; 
+    private List<AID> phoneBook;
+    private List<Module> modules = new ArrayList<>();
+
+    // Module management
     public void addModule(Module module) {
         modules.add(module);
     }
-	
-	public List<Module> getModules() {
-		return modules;
-	}
 
-	public void setModules(List<Module> modules) {
-		this.modules = modules;
-	}
-	public List<String> getValidEndpoints() {
-		if (validEndpoints == null) {
-			validEndpoints = new ArrayList<>();
-		}
-		return validEndpoints;
-	}
+    public List<Module> getModules() {
+        return modules;
+    }
 
-	public void setValidEndpoints(List<String> validEndpoints) {
-		this.validEndpoints = validEndpoints;
-	}
-	
-	public OpcUaClient getOpcUaClient() {
-		return opcUaClient;
-	}
+    public void setModules(List<Module> modules) {
+        this.modules = modules;
+    }
 
-	public void setOpcUaClient(OpcUaClient opcUaClient) {
-		this.opcUaClient = opcUaClient;
-	}
+    // Valid endpoints
+    public List<String> getValidEndpoints() {
+        if (validEndpoints == null) {
+            validEndpoints = new ArrayList<>();
+        }
+        return validEndpoints;
+    }
 
-	public List<EndpointDescription> getEndpoints() {
-	    if (endpoints == null) {
-	        endpoints = new ArrayList<>(); 
-	    }
-	    return endpoints;
-	}
+    public void setValidEndpoints(List<String> validEndpoints) {
+        this.validEndpoints = validEndpoints;
+    }
 
-	public void setEndpoints(List<EndpointDescription> endpoints) {
-		this.endpoints = endpoints;
-	}
+    // OPC UA Client management
+    public OpcUaClient getOpcUaClient() {
+        return opcUaClient;
+    }
 
-	public EndpointDescription getConfigPoint() {
-		return configPoint;
-	}
+    public void setOpcUaClient(OpcUaClient opcUaClient) {
+        this.opcUaClient = opcUaClient;
+    }
 
-	public void setConfigPoint(EndpointDescription configPoint) {
-		this.configPoint = configPoint;
-	}
+    public List<EndpointDescription> getEndpoints() {
+        if (endpoints == null) {
+            endpoints = new ArrayList<>(); 
+        }
+        return endpoints;
+    }
 
-	public AddressSpace getAddressSpace() {
-		return addressSpace;
-	}
+    public void setEndpoints(List<EndpointDescription> endpoints) {
+        this.endpoints = endpoints;
+    }
 
-	public void setAddressSpace(AddressSpace addressSpace) {
-		this.addressSpace = addressSpace;
-	}
-	
-	public OpcUaClientConfigBuilder getCfg() {
-		if (cfg == null) {
-			cfg = new OpcUaClientConfigBuilder();
-		}
-		return cfg;
-	}
+    public EndpointDescription getConfigPoint() {
+        return configPoint;
+    }
 
-	public void setCfg(OpcUaClientConfigBuilder cfg) {
-		this.cfg = cfg;
-	}
-	
-	
-	// ---- PHONE-BOOK ----
-	public void addAID2PhoneBook(AID agentAID) {
-		phoneBook = getPhoneBook();
-		phoneBook.add(agentAID);
-	}
+    public void setConfigPoint(EndpointDescription configPoint) {
+        this.configPoint = configPoint;
+    }
 
-	public List<AID> getPhoneBook() {
-		if (phoneBook == null) {
-			phoneBook = new ArrayList<AID>();
-		}
+    public AddressSpace getAddressSpace() {
+        return addressSpace;
+    }
 
-		return phoneBook;
-	}
+    public void setAddressSpace(AddressSpace addressSpace) {
+        this.addressSpace = addressSpace;
+    }
 
-	public void setPhoneBook(List<AID> phoneBook) {
-		this.phoneBook = phoneBook;
-	}
+    public OpcUaClientConfigBuilder getCfg() {
+        if (cfg == null) {
+            cfg = new OpcUaClientConfigBuilder();
+        }
+        return cfg;
+    }
 
+    public void setCfg(OpcUaClientConfigBuilder cfg) {
+        this.cfg = cfg;
+    }
+
+    // Phone book management
+    public void addAID2PhoneBook(AID agentAID) {
+        getPhoneBook().add(agentAID);
+    }
+
+    public List<AID> getPhoneBook() {
+        if (phoneBook == null) {
+            phoneBook = new ArrayList<>();
+        }
+        return phoneBook;
+    }
+
+    public void setPhoneBook(List<AID> phoneBook) {
+        this.phoneBook = phoneBook;
+    }
 }

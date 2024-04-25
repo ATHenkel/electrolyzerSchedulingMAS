@@ -5,28 +5,48 @@ import java.util.Date;
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
+/**
+ * This behavior is triggered when the scheduling process is completed.
+ * It logs the completion, saves the scheduling results, and resets the agent's state to be ready for new messages.
+ */
 public class SchedulingDone extends OneShotBehaviour {
 
-	SchedulingAgent schedulingAgent;
+    private SchedulingAgent schedulingAgent;
 
-	public SchedulingDone(SchedulingAgent schedulingAgent) {
-		this.schedulingAgent = schedulingAgent;
-	}
+    public SchedulingDone(SchedulingAgent schedulingAgent) {
+        this.schedulingAgent = schedulingAgent;
+    }
 
-	@Override
-	public void action() {
-		System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " SchedulingDone Activated");
+    @Override
+    public void action() {
+        logCompletion();
+        saveSchedulingResults();
+        resetAgentState();
+    }
 
-		String localName = this.schedulingAgent.getLocalName();
+    /**
+     * Logs the completion of the scheduling process.
+     */
+    private void logCompletion() {
+        System.out.println("Agent: " + schedulingAgent.getLocalName() + " SchedulingCompleted Activated");
+    }
 
-	    // Format for the current date and time as prefix
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-	    String datePrefix = sdf.format(new Date());
-		
-		//Save Scheduling Results as .csv-Data
-		String filepath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\out\\" + datePrefix + "_Agent" + localName + "_SchedulingResults.csv";
-		this.schedulingAgent.getInternalDataModel().getSchedulingResults().saveSchedulingResultsToCSV(filepath);
-		
-		this.schedulingAgent.getInternalDataModel().setReceiveMessages(true);
-	}
+    /**
+     * Saves the scheduling results to a CSV file in a designated output directory.
+     */
+    private void saveSchedulingResults() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+        String datePrefix = sdf.format(new Date());
+        String fileName = "_Agent" + schedulingAgent.getLocalName() + "_SchedulingResults.csv";
+        String filePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\out\\" + datePrefix + fileName;
+        
+        schedulingAgent.getInternalDataModel().getSchedulingResults().saveSchedulingResultsToCSV(filePath);
+    }
+
+    /**
+     * Resets the agent's state to be ready to receive new messages.
+     */
+    private void resetAgentState() {
+        schedulingAgent.getInternalDataModel().setReceiveMessages(true);
+    }
 }

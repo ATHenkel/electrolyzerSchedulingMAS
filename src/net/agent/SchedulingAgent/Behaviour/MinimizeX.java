@@ -110,7 +110,9 @@ public class MinimizeX extends OneShotBehaviour {
 				// Activate Standby
 				this.schedulingAgent.getInternalDataModel().setStateProduction(false);
 				this.schedulingAgent.getInternalDataModel().setStateStandby(true);
-
+				this.schedulingAgent.getInternalDataModel().setX(0);
+				min_x_value = 0;
+				
 				// Set Shutdown Period
 				this.schedulingAgent.getInternalDataModel().setPeriodShutdown(currentPeriod);
 				this.schedulingAgent.getInternalDataModel().setEarliestStartPeriod(currentPeriod + 1);
@@ -185,8 +187,8 @@ public class MinimizeX extends OneShotBehaviour {
 		}
 
 		// Next Behaviour to be executed
-		BroadcastProductionData broadcastProductionData = new BroadcastProductionData(schedulingAgent);
-		this.schedulingAgent.addBehaviour(broadcastProductionData);
+		ProductionDataBroadcaster productionDataBroadcaster = new ProductionDataBroadcaster(schedulingAgent);
+		this.schedulingAgent.addBehaviour(productionDataBroadcaster);
 	}
 
 }

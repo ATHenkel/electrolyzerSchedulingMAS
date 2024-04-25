@@ -9,14 +9,27 @@ import java.util.Date;
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
+/**
+ * This class handles the collection and dissemination of production data and decisions
+ * based on operational metrics and control strategies.
+ */
 public class GatherProductionData extends OneShotBehaviour {
 
 	SchedulingAgent schedulingAgent;
 
+    /**
+     * Constructor to initialize the ProductionDataCollector with its associated SchedulingAgent.
+     * @param schedulingAgent the agent this behaviour is part of.
+     */
 	public GatherProductionData(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
 
+	   /**
+     * Calculates the gradient of the Marginal Levelized Cost of Hydrogen (mLCOH).
+     * @param x the electrolyzer operation level to calculate the gradient for.
+     * @return the calculated gradient of mLCOH at operation level x.
+     */
 	public double calculateGradientmLCOH(double x) {
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
 		x = this.schedulingAgent.getInternalDataModel().getX();
@@ -35,6 +48,10 @@ public class GatherProductionData extends OneShotBehaviour {
 		return gradientmLCOH;
 	}
 
+	 /**
+     * Checks if the scheduling requirements for the current period are met.
+     * @return true if the current period's scheduling is complete.
+     */
 	public boolean periodScheduled() {
 		boolean periodScheduled = false;
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
@@ -47,11 +64,18 @@ public class GatherProductionData extends OneShotBehaviour {
 		boolean allUpperOperatingLimit = this.schedulingAgent.getInternalDataModel().upperLimitsAllTrueForIteration(currentIteration-1);
 		double x = this.schedulingAgent.getInternalDataModel().getX();
 		double maxPower = this.schedulingAgent.getInternalDataModel().getMaxPower();
-		
+		double x2 = this.schedulingAgent.getInternalDataModel().getXForIteration(currentPeriod, currentIteration);
+		 /**
+	     * Logs the deviation of production from demand.
+	     */
 		double demandDeviationPercentage = (demandDeviation/demand +0.000000001) * 100.0; // Conversion in percent
 		String formattedDemandDeviation = String.format("%.3f", demandDeviationPercentage); // Formatting to 3 decimal digits
 		System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode:" + currentPeriod + " Iteration:" + currentIteration + " DemandDeviation:" + formattedDemandDeviation + "%");
 
+		  /**
+	     * Evaluates whether production targets are met or unachievable.
+	     * @return true if targets are met or deemed unachievable due to constraints.
+	     */
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;
 			System.out.println("--------");
@@ -79,15 +103,6 @@ public class GatherProductionData extends OneShotBehaviour {
 
 	@Override
 	public void action() {
-		// Get Agent-ID as Integer
-		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
-		
 		//Get Values from internal knowledge base
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
 		int currentIteration = this.schedulingAgent.getInternalDataModel().getIteration();
@@ -118,9 +133,12 @@ public class GatherProductionData extends OneShotBehaviour {
 					electricityPrice, stateStandby, stateIdle, stateProduction, x, mLCOH, productionQuantity, demand);
 			
 			// Write Results into .csv-file
-			writeMatrixToExcel(agentId, currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
+			writeResultsToCsv(this.schedulingAgent.getLocalName(), currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x,
 					z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownorderIndex, electrolyzershutdown,  this.schedulingAgent.getInternalDataModel().isStateProduction(), this.schedulingAgent.getInternalDataModel().isStateStandby());
 
+			/**
+		     * Prepares for the transition to the next period.
+		     */
 			if (currentPeriod < lastPeriod) {
 				this.schedulingAgent.getInternalDataModel().incrementCurrentPeriod();
 				this.schedulingAgent.getInternalDataModel().setEnableMessageReceive(true);
@@ -130,6 +148,9 @@ public class GatherProductionData extends OneShotBehaviour {
 				this.schedulingAgent.addBehaviour(minimizeX);
 			}
 			
+		    /**
+		     * Handles end-of-scheduling activities.
+		     */
 			if (currentPeriod == lastPeriod) {
 				// Set Scheduling Complete Variable to True
 				this.schedulingAgent.getInternalDataModel().setSchedulingComplete(true);
@@ -140,7 +161,10 @@ public class GatherProductionData extends OneShotBehaviour {
 			}
 
 		} else {
-			// Next Behaviour to be executed
+			
+			  /**
+		     * Continues scheduling if not yet complete.
+		     */
 			MinimizeZ minimizeZ = new MinimizeZ(schedulingAgent);
 			this.schedulingAgent.addBehaviour(minimizeZ);
 		}
@@ -148,10 +172,9 @@ public class GatherProductionData extends OneShotBehaviour {
 	}
 	
 	//Write results of current iteration into .csv-file
-	public void writeMatrixToExcel(int AgentID, int Periode, int Iteration, double ownProduction,
+	public void writeResultsToCsv(String AgentID, int Periode, int Iteration, double ownProduction,
 	        double receivedProductionQuantity, double Demand, double x, double z, double gradient, double lambda,
 	        double demandPercentage, Long currentTimeMs, int shutdownOrderIndex, int shutdownElectrolyzer, boolean stateProduction, boolean stateStandby) {
-		
 		
 	    // Format for the current date and time as prefix
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");

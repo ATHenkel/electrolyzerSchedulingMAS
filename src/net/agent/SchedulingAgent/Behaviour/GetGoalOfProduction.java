@@ -1,33 +1,64 @@
 package net.agent.SchedulingAgent.Behaviour;
 
 import java.util.ArrayList;
-
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
+/**
+ * This behavior initializes the production goals and retrieves additional necessary data
+ * from an SQL database for the PEA-agent.
+ */
 public class GetGoalOfProduction extends OneShotBehaviour {
-	
-	SchedulingAgent schedulingAgent;
-	
-	public GetGoalOfProduction(SchedulingAgent schedulingAgent) {
-		this.schedulingAgent = schedulingAgent;
-	}
-	
-	@Override
-	public void action() {
-		//TODO: Test for Shutdown Order
-		ArrayList<Integer> shutdownOrderList = this.schedulingAgent.getInternalDataModel().getShutdownOrderList();
-		shutdownOrderList.add(2);
-		shutdownOrderList.add(1);
-		
-		//Read Values from SQL-Database
-		System.out.println("Agent " + this.schedulingAgent.getLocalName() + " connect to SQL-Database");
-		SQLDatabaseConnector connector = new SQLDatabaseConnector(schedulingAgent);
-		connector.readDataFromDatabase();
-		
-		//Next behaviour to be executed
-		MinimizeX minimizeX = new MinimizeX(schedulingAgent);
-		this.schedulingAgent.addBehaviour(minimizeX);
-	}
+    
+    private SchedulingAgent schedulingAgent;
 
+    /**
+     * Constructor for initializing the behavior with a reference to its scheduling agent.
+     * @param schedulingAgent the agent this behavior belongs to.
+     */
+    public GetGoalOfProduction(SchedulingAgent schedulingAgent) {
+        this.schedulingAgent = schedulingAgent;
+    }
+    
+    @Override
+    public void action() {
+        // Initialize or test the shutdown order list.
+        setupShutdownOrder();
+
+        // Connect to and read from SQL database.
+        connectAndReadFromDatabase();
+
+        // Schedule the next behavior in the agent's life cycle.
+        transitionToNextBehavior();
+    }
+
+    /**
+     * Sets up or tests the shutdown order list which might be used to determine the order
+     * in which production facilities should reduce output or shut down.
+     */
+    private void setupShutdownOrder() {
+    	//TODO: 1. Improve Shutdown-List
+        ArrayList<Integer> shutdownOrderList = schedulingAgent.getInternalDataModel().getShutdownOrderList();
+        shutdownOrderList.add(2);
+        shutdownOrderList.add(1);
+        System.out.println("Shutdown order list initialized with values for agent " + schedulingAgent.getLocalName());
+    }
+
+    /**
+     * Establishes a connection to the SQL database and reads necessary data.
+     */
+    private void connectAndReadFromDatabase() {
+        System.out.println("Agent " + schedulingAgent.getLocalName() + " connecting to SQL database...");
+        SQLDatabaseConnector connector = new SQLDatabaseConnector(schedulingAgent);
+        connector.readDataFromDatabase();
+    }
+
+    /**
+     * Transitions to the next behavior, typically to start minimizing production costs or adjusting production levels.
+     */
+    private void transitionToNextBehavior() {
+        MinimizeX minimizeX = new MinimizeX(schedulingAgent);
+        schedulingAgent.addBehaviour(minimizeX);
+        System.out.println("Transitioning to MinimizeX behavior.");
+    }
 }

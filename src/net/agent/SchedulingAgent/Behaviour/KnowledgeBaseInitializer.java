@@ -5,8 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -21,24 +19,21 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import Standardintegrationprofile.ProductionCurveData;
 import Standardintegrationprofile.Property;
 import Standardintegrationprofile.StandardIntegrationProfile;
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
-import net.bytebuddy.asm.Advice.This;
 
-public class initializeKnowledgebase extends OneShotBehaviour {
+/**
+ * Initializes the knowledge base by parsing properties from a Standard Integration Profile.
+ */
+public class KnowledgeBaseInitializer extends OneShotBehaviour {
 
 	SchedulingAgent schedulingAgent;
 
-	public initializeKnowledgebase(SchedulingAgent schedulingAgent) {
+	public KnowledgeBaseInitializer (SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
 
@@ -52,7 +47,10 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 		// Get Properties by Parsing Standardintegrationprofile and save in List
 		List<Property> properties = parseJsonList(mtpFileName);
 
-		// Initialize knowledge base with values from the standard integration profile
+		 /**
+	     * Initializes the scheduling agent's internal model with values from parsed properties.
+	     * @param properties List of properties to initialize the model.
+	     */
 		for (Property property : properties) {
 			switch (property.getName()) {
 			case "Stack-Power":
@@ -239,8 +237,6 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 
 						// Fitting
 						double[] coefficients = fitter.fit(pointsToList(utilization, productionRate, 0));
-						// coefficients = adjustCoefficientsForShift(coefficients, utilization,
-						// productionRate);
 
 						// Calculation of the R^2 value
 						double SSR = 0.0; // Sum of Squared Residuals
@@ -280,7 +276,12 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 			}
 		}
 	}
-
+	
+    /**
+     * Parses properties from a JSON file within a ZIP archive.
+     * @param mtpFileName The name of the MTP file containing the JSON.
+     * @return A list of properties parsed from the JSON file.
+     */
 	public static List<Property> parseJsonList(String mtpFileName) {
 		List<Property> properties = new ArrayList<>();
 
@@ -346,49 +347,6 @@ public class initializeKnowledgebase extends OneShotBehaviour {
 			result += coefficients[i] * Math.pow(x, i);
 		}
 		return result;
-	}
-
-	private static void writeDataToColumn(XSSFSheet sheet, double[] data, int column) {
-		int rowCount = 1; // Start with the second line (index 1) so as not to overwrite the headings
-		for (int i = 0; i < data.length; i++) {
-			Row row = sheet.getRow(rowCount);
-			if (row == null) {
-				row = sheet.createRow(rowCount);
-			}
-			Cell cell = row.createCell(column);
-			cell.setCellValue(data[i]);
-			rowCount++; // Only increase rowCount if a new data value is written
-		}
-	}
-
-	private void writeDataToExcel(String filepath, XSSFSheet sheet, double[] utilization, double[] productionRate,
-			XSSFWorkbook workbook, double coefficient0) {
-		try (workbook) {
-
-			// Write Data to .xlsx file
-			writeDataToColumn(sheet, utilization, 0);
-			writeDataToColumn(sheet, productionRate, 1);
-
-			// Write coefficients 0 in the table
-			Row row = sheet.getRow(8);
-			Cell cell = row.createCell(5);
-			cell.setCellValue(coefficient0);
-
-			workbook.setForceFormulaRecalculation(true);
-
-			CellType coefficient2 = workbook.getSheet("Data").getRow(5).getCell(5).getCachedFormulaResultType();
-			String coefficient1 = workbook.getSheet("Data").getRow(6).getCell(5).getRawValue();
-
-			System.out.println("Coefficient A: " + coefficient1);
-			System.out.println("Coefficient B: " + coefficient2);
-
-			try (FileOutputStream outFile = new FileOutputStream(filepath)) {
-				workbook.write(outFile);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

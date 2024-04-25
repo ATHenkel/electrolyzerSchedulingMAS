@@ -35,7 +35,6 @@ public class instantiateAgents extends OneShotBehaviour {
 	public void action() {
 		
 		//Get TopologyFile
-		//String topologyFilePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\08_Veröffentlichungen\\2024\\Energies\\2024-01-18 ElectrolysisPlant\\Topology\\ElectrolysisPlant.mtd";
 		String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
 		
 		List<Module> modules = parseTopologyFile(topologyFilePath);

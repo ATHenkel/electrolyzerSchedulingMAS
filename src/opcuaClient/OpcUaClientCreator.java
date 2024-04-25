@@ -61,16 +61,9 @@ public class OpcUaClientCreator {
 	                .setIdentityProvider(getIdentityProvider(user, password))
 	                .setRequestTimeout(uint(5000))
 	                .build());
-
-
-
 	    return client;
 	}
 	
-	
-
-
-
 	/**
 	 * Create an IdentityProvider depending on the username and password provided
 	 * @param user
@@ -114,9 +107,6 @@ public class OpcUaClientCreator {
 
 	    return endpoint;
 	}
-
-	
-
 	
 	/**
 	 * Just wraps the endpoint filter predicate into a function
@@ -132,10 +122,6 @@ public class OpcUaClientCreator {
 	 * @return
 	 */
 	static SecurityPolicy getSecurityPolicy() {
-		// Note that this is currently fixed, there may also be an option or logic to find a "good" one
-		//return SecurityPolicy.Basic256Sha256;
 		return SecurityPolicy.None;
-		//auskommentiert, da Milo-Server keine Security Policy nutzt
-		//return SecurityPolicy.None;
 	}
 }

@@ -17,6 +17,77 @@ import org.eclipse.milo.opcua.stack.core.util.EndpointUtil;
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
+/**
+ * Establishes a connection to an OPC UA server and configures the client.
+ */
+public class OPCUAConnection extends OneShotBehaviour {
+    private SchedulingAgent schedulingAgent;
+
+    public OPCUAConnection(SchedulingAgent schedulingAgent) {
+        this.schedulingAgent = schedulingAgent;
+    }
+
+    @Override
+    public void action() {
+        String endpointURL = schedulingAgent.getInternalDataModel().getEndpointURL();
+        initializeLogger();
+        URI uri = parseEndpointURL(endpointURL);
+
+        try {
+            List<EndpointDescription> endpoints = discoverServerEndpoints(endpointURL, uri);
+            setupClientConfig(endpoints, uri);
+            connectToServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        schedulingAgent.addBehaviour(new MonitorElectrolyzerState(schedulingAgent));
+    }
+
+    private void initializeLogger() {
+        Configurator.initialize(new DefaultConfiguration());
+        Configurator.setRootLevel(Level.INFO);
+    }
+
+    private URI parseEndpointURL(String endpointURL) {
+        try {
+            return new URI(endpointURL);
+        } catch (URISyntaxException e) {
+            System.err.println("Invalid URI: " + endpointURL);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<EndpointDescription> discoverServerEndpoints(String endpointURL, URI uri) throws Exception {
+        List<EndpointDescription> endpoints = DiscoveryClient.getEndpoints(endpointURL).get();
+        schedulingAgent.getInternalDataModel().setEndpoints(endpoints);
+        return endpoints;
+    }
+
+    private void setupClientConfig(List<EndpointDescription> endpoints, URI uri) throws Exception {
+        EndpointDescription configPoint = EndpointUtil.updateUrl(endpoints.get(0), uri.getHost(), uri.getPort());
+        schedulingAgent.getInternalDataModel().setConfigPoint(configPoint);
+        
+        OpcUaClientConfigBuilder cfg = new OpcUaClientConfigBuilder();
+        cfg.setEndpoint(configPoint);
+        schedulingAgent.getInternalDataModel().getCfg().setEndpoint(configPoint);
+    }
+
+    private void connectToServer() throws Exception {
+        OpcUaClient client = OpcUaClient.create(schedulingAgent.getInternalDataModel().getCfg().build());
+        client.connect().get();
+        AddressSpace addressSpace = client.getAddressSpace();
+        schedulingAgent.getInternalDataModel().setAddressSpace(addressSpace);
+        System.out.println("PEA-Agent:" + schedulingAgent.getLocalName() + " connected to OPC-UA MTP-Server");
+    }
+}
+
+
+
+/*
+ * BackUp ist funktionierender Code.
+ 
 public class OPCUAConnection extends OneShotBehaviour {
 
 	public OPCUAConnection(SchedulingAgent schedulingAgent) {
@@ -27,18 +98,6 @@ public class OPCUAConnection extends OneShotBehaviour {
 	@Override
 	public void action() {
 		
-    	//Get Agent-ID as Integer
-		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
-		
-		//TODO: OPC UA Connection for Agent 1 and 3
-		if (agentId == 1 || agentId == 3){
-			
 		// Internal Data Model
 		List<EndpointDescription> endpoints = this.schedulingAgent.getInternalDataModel().getEndpoints();
 		EndpointDescription configPoint = this.schedulingAgent.getInternalDataModel().getConfigPoint();
@@ -90,5 +149,6 @@ public class OPCUAConnection extends OneShotBehaviour {
 		MonitorElectrolyzerState monitorElectrolyzerState = new MonitorElectrolyzerState(schedulingAgent);
 		this.schedulingAgent.addBehaviour(monitorElectrolyzerState);
 	}
-	}
 }
+
+*/
