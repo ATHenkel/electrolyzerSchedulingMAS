@@ -14,7 +14,8 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * based on operational metrics and control strategies.
  */
 public class GatherProductionData extends OneShotBehaviour {
-
+	private static final long serialVersionUID = -4109493329763722748L;
+	
 	SchedulingAgent schedulingAgent;
 
     /**
@@ -64,7 +65,7 @@ public class GatherProductionData extends OneShotBehaviour {
 		boolean allUpperOperatingLimit = this.schedulingAgent.getInternalDataModel().upperLimitsAllTrueForIteration(currentIteration-1);
 		double x = this.schedulingAgent.getInternalDataModel().getX();
 		double maxPower = this.schedulingAgent.getInternalDataModel().getMaxPower();
-		double x2 = this.schedulingAgent.getInternalDataModel().getXForIteration(currentPeriod, currentIteration);
+		
 		 /**
 	     * Logs the deviation of production from demand.
 	     */
@@ -112,7 +113,7 @@ public class GatherProductionData extends OneShotBehaviour {
 		double electricityPrice = this.schedulingAgent.getInternalDataModel().getDSMInformation().getElectricityPriceForPeriod(currentPeriod);
 		double x = this.schedulingAgent.getInternalDataModel().getX();
 		double z = this.schedulingAgent.getInternalDataModel().getZ();
-		double mLCOH = this.schedulingAgent.getInternalDataModel().getIterationADMMTable().get(currentIteration).getmLCOH();
+		double mLCOH = this.schedulingAgent.getInternalDataModel().getmLCOHForPeriodAndIteration(currentPeriod, currentIteration);
 		double lambda = this.schedulingAgent.getInternalDataModel().getLambda();
 		double sumProduction = this.schedulingAgent.getInternalDataModel().getSumProduction();
 		double demandDeviation = productionQuantity + sumProduction - demand;

@@ -20,8 +20,9 @@ import net.agent.DSMInformation.SchedulingResults;
  * It handles configurations, scheduling information, and OPC UA connections.
  */
 public class InternalDataModel extends AbstractUserObject {
-	
-	 // Global configuration and state variables
+	private static final long serialVersionUID = -3954236452378160946L;
+
+	// Global configuration and state variables
 	private LocalDateTime lastScheduleWriteTime = LocalDateTime.of(1970, 1, 1, 0, 0); //Create variable to measure time and initialize with outdated values
 	
 	// OPC UA specific attributes
@@ -31,7 +32,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private OpcUaClientConfigBuilder cfg;
 	private EndpointDescription configPoint;
 	private AddressSpace addressSpace;
-	private int schedulingResultNextPeriod = 1; //Defines the period with which the PLC was last communicated the scheduling results
+	private int schedulingResultNextPeriod = 0; //Defines the period with which the PLC was last communicated the scheduling results
 	private boolean headerWritten = true; //Boolean variable to make sure that header will be written only 1x 
 	private int counter;
 	
@@ -55,7 +56,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private double penaltyFactor = 0; // Penalty-Term (Value: 0.2)
 	private int iteration = 0; // Iteration
 	private double epsilonProduction = 0.002; // Tolerable deviation from the required production quantity (Value: 0.0005 (fast convergence))
-	private int currentPeriod = 1;
+	private int currentPeriod = 0;
 	private int periodShutdown;
 	private double demandShutdown;
 	private int earliestStartPeriod;
@@ -502,6 +503,26 @@ public class InternalDataModel extends AbstractUserObject {
 
 	// ---- Methods for Managing Production Quantities ----
 
+    /**
+     * Retrieves the mLCOH (Marginal Levelized Cost of Hydrogen) for a specific period and iteration.
+     *
+     * @param period    The scheduling period.
+     * @param iteration The iteration number.
+     * @return The mLCOH for the specified period and iteration, or Double.NaN if not found.
+     */
+    public double getmLCOHForPeriodAndIteration(int period, int iteration) {
+        // Iterate through each IterationADMM instance in the list
+        for (IterationADMM admm : iterationADMMTable) {
+            // Check if the period and iteration match the provided values
+            if (admm.getPeriod() == period && admm.getIteration() == iteration) {
+                // Return the mLCOH value for the matching period and iteration
+                return admm.getmLCOH();
+            }
+        }
+        // If no matching period and iteration is found, return Double.NaN
+        return Double.NaN;
+    }
+	
 	/**
 	 * Adds a received production quantity for a specific period and iteration.
 	 * @param period the period index.

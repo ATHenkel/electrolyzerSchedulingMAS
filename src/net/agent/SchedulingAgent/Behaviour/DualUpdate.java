@@ -13,8 +13,9 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * as well as computation and adjustment of lambda values based on operational constraints and targets.
  */
 public class DualUpdate extends OneShotBehaviour {
-
-    private SchedulingAgent schedulingAgent;
+	private static final long serialVersionUID = -197768266479768780L;
+	
+	private SchedulingAgent schedulingAgent;
 
     /**
      * Constructs a ProductionStateUpdater behaviour with reference to its SchedulingAgent.
@@ -94,11 +95,22 @@ public class DualUpdate extends OneShotBehaviour {
         if (schedulingAgent.getInternalDataModel().isStateProduction()) {
             double delta = Math.abs(x - z);
             double k;
-            double limitedExponent = delta > 0.01 ? 3.7 : 1.0;
-            penaltyFactor = delta > 0.01 ? 0.62021 : 0.3;
-            k = Math.exp(limitedExponent);
+            double limitedExponent;
+            if (delta > 0.01) {
+                limitedExponent = 3; // 26.04 - 3.2 funktioniert gut 
+                penaltyFactor = 0.3; //26.04 - 0.62 funktioniert gut
+            } else {
+                limitedExponent = 1.0;
+                penaltyFactor = 0.3;
+            }
+            
             double gradient = Math.abs(calculateGradientmLCOH(x)) + 0.00001;
-            lambda = x > 0 ? lambda + penaltyFactor * (x - z) * gradient * k : 0;
+            if (x > 0) {
+                k = Math.exp(limitedExponent);
+                lambda = lambda + penaltyFactor * (x - z) * gradient * k;
+            } else {
+                lambda = 0;
+            }
         }
         
         writeResultsToCsv(schedulingAgent.getLocalName(), currentPeriod, currentIteration, productionQuantity, sumProduction, demand, x, z, calculateGradientmLCOH(x), lambda, demandPercentage, currentMilliseconds, shutdownOrderIndex, electrolyzerShutdown, schedulingAgent.getInternalDataModel().isStateProduction(), schedulingAgent.getInternalDataModel().isStateStandby());

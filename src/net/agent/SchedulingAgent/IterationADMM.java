@@ -78,4 +78,5 @@ public class IterationADMM {
     public void setX(double x) {
         this.x = x;
     }
+    
 }

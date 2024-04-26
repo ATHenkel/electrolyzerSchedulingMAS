@@ -21,7 +21,9 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * Establishes a connection to an OPC UA server and configures the client.
  */
 public class OPCUAConnection extends OneShotBehaviour {
-    private SchedulingAgent schedulingAgent;
+	private static final long serialVersionUID = 1L;
+	
+	private SchedulingAgent schedulingAgent;
 
     public OPCUAConnection(SchedulingAgent schedulingAgent) {
         this.schedulingAgent = schedulingAgent;

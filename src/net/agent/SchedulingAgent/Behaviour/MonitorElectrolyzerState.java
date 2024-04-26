@@ -140,7 +140,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
 			        if (timeDifference.getSeconds() >= writeTimeDifference) {
 			        	
 						//Update the time and the counter 
-						this.schedulingAgent.getInternalDataModel().setLastScheduleWriteTime(LocalDateTime.now());
+				//		this.schedulingAgent.getInternalDataModel().setLastScheduleWriteTime(LocalDateTime.now());
 						this.schedulingAgent.getInternalDataModel().incrementSchedulingResultNextPeriod();
 			        	
 			        	System.out.println("Write new Value after " + timeDifference.getSeconds() + " s " + " actual Period: " + nextPeriod + " No. Periods Scheduled " + numberScheduledPeriods);

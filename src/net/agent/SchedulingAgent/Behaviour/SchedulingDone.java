@@ -10,8 +10,9 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * It logs the completion, saves the scheduling results, and resets the agent's state to be ready for new messages.
  */
 public class SchedulingDone extends OneShotBehaviour {
-
-    private SchedulingAgent schedulingAgent;
+	private static final long serialVersionUID = -7479890786191155653L;
+	
+	private SchedulingAgent schedulingAgent;
 
     public SchedulingDone(SchedulingAgent schedulingAgent) {
         this.schedulingAgent = schedulingAgent;
@@ -22,6 +23,13 @@ public class SchedulingDone extends OneShotBehaviour {
         logCompletion();
         saveSchedulingResults();
         resetAgentState();
+        
+        System.err.println("-------------");
+        
+        if (Integer.valueOf(this.schedulingAgent.getLocalName()) == 1) {
+			
+        	this.schedulingAgent.getInternalDataModel().getSchedulingResults().printSchedulingResults();
+		}
     }
 
     /**

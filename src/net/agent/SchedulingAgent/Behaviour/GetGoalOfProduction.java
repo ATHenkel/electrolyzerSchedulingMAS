@@ -41,6 +41,12 @@ public class GetGoalOfProduction extends OneShotBehaviour {
         ArrayList<Integer> shutdownOrderList = schedulingAgent.getInternalDataModel().getShutdownOrderList();
         shutdownOrderList.add(2);
         shutdownOrderList.add(1);
+        shutdownOrderList.add(4);
+        shutdownOrderList.add(3);
+        shutdownOrderList.add(5);
+        shutdownOrderList.add(6);
+        shutdownOrderList.add(7);
+        shutdownOrderList.add(8);
         System.out.println("Shutdown order list initialized with values for agent " + schedulingAgent.getLocalName());
     }
 

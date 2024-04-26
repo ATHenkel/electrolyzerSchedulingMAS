@@ -3,10 +3,19 @@ package net.agent.SchedulingAgent.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
+/**
+ * A behavior class object used to minimize the variable X.
+ * The goal is to find the lowest mLCOH (marginal Levelized Cost of Hydrogen) value by optimizing production.
+ */
 public class MinimizeX extends OneShotBehaviour {
-
+	private static final long serialVersionUID = -5844996727231977882L;
+	
 	SchedulingAgent schedulingAgent;
-
+	
+	  /**
+     * Constructor for MinimizeX behavior.
+     * @param schedulingAgent The agent to which this behavior is attached.
+     */
 	public MinimizeX(SchedulingAgent schedulingAgent) {
 		this.schedulingAgent = schedulingAgent;
 	}
@@ -50,18 +59,13 @@ public class MinimizeX extends OneShotBehaviour {
 		return productionQuantity;
 	}
 
+
+
 	public double minimizeLx() {
-
-		// Get Agent-ID as Integer
-		String localName = this.schedulingAgent.getLocalName();
-		int agentId;
-		try {
-			agentId = Integer.parseInt(localName);
-		} catch (NumberFormatException e) {
-			agentId = -1; // Default value if the conversion fails.
-		}
-
-		// Get Information from the InternalDataModel
+		
+		/**
+		 * Get Parameters from the InternalDataModel
+		 */
 		double CapEx = this.schedulingAgent.getInternalDataModel().getCapEx();
 		double PEL = this.schedulingAgent.getInternalDataModel().getPEL();
 		int currentPeriod = this.schedulingAgent.getInternalDataModel().getCurrentPeriod();
@@ -83,7 +87,9 @@ public class MinimizeX extends OneShotBehaviour {
 		int startUpDuration = this.schedulingAgent.getInternalDataModel().getStartUpDuration();
 		boolean stateProduction = this.schedulingAgent.getInternalDataModel().isStateProduction();
 
-		// Parameters for Solving
+		/**
+		 * Parameters for Solving 
+		 */
 		double min_mLCOHLambda = Double.POSITIVE_INFINITY;
 		double min_mLCOH = Double.POSITIVE_INFINITY;
 		double mH2_hour;
@@ -104,7 +110,7 @@ public class MinimizeX extends OneShotBehaviour {
 		if (this.schedulingAgent.getInternalDataModel().lowerLimitsAllTrueForIteration(currentIteration - 1)) {
 
 			// Check, if this electrolyzer should be set to standby
-			if (agentId == nextShutdownElectrolyzer) {
+			if (Integer.parseInt(this.schedulingAgent.getLocalName()) == nextShutdownElectrolyzer) {
 				System.err.println("Agent: " + this.schedulingAgent.getLocalName() + " Standby-Activated!");
 				
 				// Activate Standby
@@ -175,6 +181,11 @@ public class MinimizeX extends OneShotBehaviour {
 		return min_x_value;
 	}
 
+	
+	 /**
+     * This method is called when the behavior is executed.
+     * It performs the actions to minimize X.
+     */
 	@Override
 	public void action() {
 

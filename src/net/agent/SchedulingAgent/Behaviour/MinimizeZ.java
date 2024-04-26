@@ -4,6 +4,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
 public class MinimizeZ extends OneShotBehaviour {
+	private static final long serialVersionUID = -1406204285924649555L;
 
 	// Instantiate Agent
 	public MinimizeZ(SchedulingAgent schedulingAgent) {
