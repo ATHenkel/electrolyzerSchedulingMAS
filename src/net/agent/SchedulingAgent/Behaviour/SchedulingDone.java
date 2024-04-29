@@ -23,13 +23,6 @@ public class SchedulingDone extends OneShotBehaviour {
         logCompletion();
         saveSchedulingResults();
         resetAgentState();
-        
-        System.err.println("-------------");
-        
-        if (Integer.valueOf(this.schedulingAgent.getLocalName()) == 1) {
-			
-        	this.schedulingAgent.getInternalDataModel().getSchedulingResults().printSchedulingResults();
-		}
     }
 
     /**

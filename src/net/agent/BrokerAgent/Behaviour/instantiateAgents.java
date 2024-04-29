@@ -21,9 +21,11 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.StaleProxyException;
 import net.agent.BrokerAgent.BrokerAgent;
+import net.agent.BrokerAgent.ModuleParser;
 import net.agent.SchedulingAgent.SchedulingAgent;
 
 public class instantiateAgents extends OneShotBehaviour {
+	private static final long serialVersionUID = 5703081042603709680L;
 
 	BrokerAgent brokerAgent;
 
@@ -33,24 +35,28 @@ public class instantiateAgents extends OneShotBehaviour {
 
 	@Override
 	public void action() {
-		
-		//Get TopologyFile
+
+		// Get TopologyFile
 		String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
+		System.out.println("-----");
 		
-		List<Module> modules = parseTopologyFile(topologyFilePath);
+		ModuleParser parser = new ModuleParser(brokerAgent);
+		// Parse die Module aus der Topologie-Datei
+        List<net.agent.BrokerAgent.Module> modules = parser.parseTopologyFile(topologyFilePath);
+		
 		this.brokerAgent.getInternalDataModel().setModules(modules);
 
 		// Iterate over modules using Iterator to avoid ConcurrentModificationException
-		Iterator<Module> iterator = modules.iterator();
+		Iterator<net.agent.BrokerAgent.Module> iterator = modules.iterator();
 		while (iterator.hasNext()) {
-			Module module = iterator.next();
-			
-			//Identify PEA types via DeviceClass of the PEAInformationLabel in the MTP
+			net.agent.BrokerAgent.Module module = iterator.next();
+
+			// Identify PEA types via DeviceClass of the PEAInformationLabel in the MTP
 			String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\MTP Lib\\"
-			+ module.visibleName + ".aml";
+					+ module.visibleName + ".aml";
 
 			if (new File(amlFilePath).exists()) {
-				//Check, if Module is an electrolyser 
+				// Check, if Module is an electrolyser
 				if (!containsElectrolyserInfo(amlFilePath)) {
 					System.out.println(module.visibleName + " is not an Electrolyser. Removing from the list.");
 					iterator.remove(); // Remove the module from the list
@@ -60,9 +66,6 @@ public class instantiateAgents extends OneShotBehaviour {
 			}
 		}
 
-		// Print the remaining Modules
-		printModules();
-
 		// Start the JADE-Plattform
 		Runtime rt = Runtime.instance();
 		Profile p = new ProfileImpl();
@@ -70,24 +73,25 @@ public class instantiateAgents extends OneShotBehaviour {
 
 		// Create a list of scheduling agents
 		List<SchedulingAgent> agentList = new ArrayList<>();
-		
-		//Get Number of PEA-Agents
+
+		// Get Number of PEA-Agents
 		int numberofAgents = modules.size();
 
 		// Iterate over the number of agents and instantiate scheduling agents
-		for (int i = 0; i <= numberofAgents-1; i++) {
+		for (int i = 0; i <= numberofAgents - 1; i++) {
 			try {
-				//Get current Module
-				Module currentModule = modules.get(i);
-				
-				//Add .mtp extension to the MTP file
+				// Get current Module
+				net.agent.BrokerAgent.Module currentModule = modules.get(i);
+
+				// Add .mtp extension to the MTP file
 				String mtpFileName = currentModule.visibleName + ".mtp";
-				SchedulingAgent schedulingAgent = new SchedulingAgent(currentModule.endpointUrl, mtpFileName, numberofAgents); 
+				SchedulingAgent schedulingAgent = new SchedulingAgent(currentModule.endpointUrl, mtpFileName,
+						numberofAgents);
 				// Add the agent to the list
 				agentList.add(schedulingAgent);
 
 				// Output
-				System.out.println("PEA-agent " + (i+1) + " was instantiated.");
+				System.out.println("PEA-agent " + (i + 1) + " was instantiated.");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -106,8 +110,8 @@ public class instantiateAgents extends OneShotBehaviour {
 		}
 	}
 
-	
-	// Method for reading out the MTP. The DeviceClass in the PEAInformationLabel is used to check whether it is an electrolyser
+	// Method for reading out the MTP. The DeviceClass in the PEAInformationLabel is
+	// used to check whether it is an electrolyser
 	public static boolean containsElectrolyserInfo(String filePath) {
 		try {
 			File inputFile = new File(filePath);
@@ -145,65 +149,6 @@ public class instantiateAgents extends OneShotBehaviour {
 		}
 
 		return false; // Electrolyser information not found
-	}
-
-	//Definition of a module (PEA)
-	public static class Module {
-		String visibleName;
-		String endpointUrl;
-
-		public Module(String visibleName, String endpointUrl) {
-			this.visibleName = visibleName;
-			this.endpointUrl = endpointUrl;
-		}
-
-		@Override
-		public String toString() {
-			return "VisibleName: " + visibleName + ", EndpointUrl: " + endpointUrl;
-		}
-	}
-
-	// Method for parsing the plant topology and identifying PEAs 
-	public List<Module> parseTopologyFile(String filePath) {
-
-		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-			String line;
-			String visibleName = null; //Corresponds to the name of the MTP
-			String endpointUrl = null;
-
-			while ((line = br.readLine()) != null) {
-				if (line.contains("<VisibleName>")) {
-					visibleName = line.trim().replace("<VisibleName>", "").replace("</VisibleName>", "");
-				} else if (line.contains("<OPCServer ID=")) {
-					String opcServerLine = line.trim();
-					int idStartIndex = opcServerLine.indexOf("\"") + 1;
-					int idEndIndex = opcServerLine.indexOf("\"", idStartIndex);
-					String opcServerId = opcServerLine.substring(idStartIndex, idEndIndex);
-					endpointUrl = opcServerLine.substring(opcServerLine.indexOf(">") + 1,
-							opcServerLine.indexOf("</OPCServer>"));
-				} else if (line.contains("</IsInstance>")) {
-					if (visibleName != null && endpointUrl != null) {
-						this.brokerAgent.getInternalDataModel().addModule(new Module(visibleName, endpointUrl));
-
-						visibleName = null;
-						endpointUrl = null;
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// return modules;
-		return this.brokerAgent.getInternalDataModel().getModules();
-	}
-
-	// Method for displaying all modules
-	public void printModules() {
-		List<Module> modules = this.brokerAgent.getInternalDataModel().getModules();
-		for (Module module : modules) {
-			System.out.println(module);
-		}
 	}
 
 }

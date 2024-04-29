@@ -9,7 +9,6 @@ import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfigBuilder;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import agentgui.core.common.AbstractUserObject;
 import jade.core.AID;
-import net.agent.BrokerAgent.Behaviour.instantiateAgents.Module;
 
 /**
  * Internal data model of Broker-Agent for storing agent configurations and managing shared resources.
