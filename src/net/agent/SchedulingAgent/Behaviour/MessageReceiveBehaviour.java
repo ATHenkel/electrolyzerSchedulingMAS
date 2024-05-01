@@ -9,6 +9,8 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * and initiating rescheduling if necessary.
  */
 public class MessageReceiveBehaviour extends CyclicBehaviour {
+	private static final long serialVersionUID = -834250227095902254L;
+	
 	double sumProduction;
 
 	public MessageReceiveBehaviour(SchedulingAgent schedulingAgent) {

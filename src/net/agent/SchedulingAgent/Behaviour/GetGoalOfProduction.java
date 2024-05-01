@@ -9,8 +9,9 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * from an SQL database for the PEA-agent.
  */
 public class GetGoalOfProduction extends OneShotBehaviour {
-    
-    private SchedulingAgent schedulingAgent;
+	private static final long serialVersionUID = -5918598233604475430L;
+	
+	private SchedulingAgent schedulingAgent;
 
     /**
      * Constructor for initializing the behavior with a reference to its scheduling agent.
@@ -65,6 +66,5 @@ public class GetGoalOfProduction extends OneShotBehaviour {
     private void transitionToNextBehavior() {
         MinimizeX minimizeX = new MinimizeX(schedulingAgent);
         schedulingAgent.addBehaviour(minimizeX);
-        System.out.println("Transitioning to MinimizeX behavior.");
     }
 }

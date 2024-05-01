@@ -30,7 +30,8 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * Initializes the knowledge base by parsing properties from a Standard Integration Profile.
  */
 public class KnowledgeBaseInitializer extends OneShotBehaviour {
-
+	private static final long serialVersionUID = 5793523176602743352L;
+	
 	SchedulingAgent schedulingAgent;
 
 	public KnowledgeBaseInitializer (SchedulingAgent schedulingAgent) {
@@ -40,7 +41,7 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 	@Override
 	public void action() {
 
-		System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+		System.out.println(this.schedulingAgent.getLocalName()
 				+ " parse Standardintegrationsprofile to initalize knowledgeBase");
 		String mtpFileName = this.schedulingAgent.getInternalDataModel().getMtpFileName();
 
@@ -58,14 +59,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setPEL(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Stack-Power successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Stack-Power' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -75,15 +76,15 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setCapEx(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName() + " CapEx of "
+						System.out.println(this.schedulingAgent.getLocalName() + " CapEx of "
 								+ Double.parseDouble((String) value) + "€ successfully initialized");
 					} else {
 
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'CapEx' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -93,14 +94,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setOMFactor(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " OM-Costs successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'OM-Costs' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -111,14 +112,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel()
 								.setUtilizationtime(Integer.parseInt((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Utilization-Time successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Utilization-Time' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -128,14 +129,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setLoadFactor(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Load-Factor successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Load-Factor' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -145,14 +146,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setDiscountrate(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Discount-Rate successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Discount-Rate' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -162,14 +163,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setMinPower(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Operating-Limit-Low successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Operation-Limit-Low' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -179,14 +180,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setMaxPower(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Operating-Limit-High successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Operation-Limit-High' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;
@@ -197,14 +198,14 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel()
 								.setStartUpDuration(Double.parseDouble((String) value));
-						System.out.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.out.println(this.schedulingAgent.getLocalName()
 								+ " Cold-Start-Time successfully initialized");
 					} else {
-						System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Cold-Start-Time' is not a String");
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("PEA-Agent: " + this.schedulingAgent.getLocalName()
+					System.err.println(this.schedulingAgent.getLocalName()
 							+ " Error during conversion of the data type");
 				}
 				break;

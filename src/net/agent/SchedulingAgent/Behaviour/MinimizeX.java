@@ -110,7 +110,8 @@ public class MinimizeX extends OneShotBehaviour {
 		if (this.schedulingAgent.getInternalDataModel().lowerLimitsAllTrueForIteration(currentIteration - 1)) {
 
 			// Check, if this electrolyzer should be set to standby
-			if (Integer.parseInt(this.schedulingAgent.getLocalName()) == nextShutdownElectrolyzer) {
+			if (extractAgentNumber(this.schedulingAgent.getLocalName()) == nextShutdownElectrolyzer) {
+				int number = extractAgentNumber(this.schedulingAgent.getLocalName());
 				System.err.println("Agent: " + this.schedulingAgent.getLocalName() + " Standby-Activated!");
 				
 				// Activate Standby
@@ -180,6 +181,32 @@ public class MinimizeX extends OneShotBehaviour {
 		
 		return min_x_value;
 	}
+	
+	/**
+	 * Extracts the agent number from the agent name.
+	 * Assumes that the agent name follows the format "<instanceName>:PEA_Agent<number>".
+	 * @param agentName the name of the agent
+	 * @return the agent number
+	 */
+	public static int extractAgentNumber(String agentName) {
+	    // Split the agent name by ":PEA_Agent" to get the part containing the agent number
+	    String[] parts = agentName.split("--PEAAgent");
+
+	    // Check if the agent name follows the expected format
+	    if (parts.length == 2) {
+	        // Extract the agent number from the second part and convert it to an integer
+	        try {
+	            return Integer.parseInt(parts[1]);
+	        } catch (NumberFormatException e) {
+	            // If the agent number is not a valid integer, return -1 to indicate an error
+	            return -1;
+	        }
+	    } else {
+	        // If the agent name does not follow the expected format, return -1 to indicate an error
+	        return -1;
+	    }
+	}
+
 
 	
 	 /**

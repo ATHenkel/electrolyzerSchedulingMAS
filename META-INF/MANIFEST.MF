@@ -13,5 +13,8 @@ Export-Package: net.agent.DSMInformation,
  net.agent.SchedulingAgent,
  net.agent.SchedulingAgent.Behaviour,
  net.agent.SchedulingAgent.classLoadService,
- opcuaClient
+ opcuaClient,
+ opcuaServer,
+ caex,
+ mtpModification
 Bundle-ActivationPolicy: lazy

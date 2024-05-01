@@ -1,5 +1,7 @@
 package net.agent.SchedulingAgent;
 
+import java.util.List;
+
 import jade.core.AID;
 import jade.core.Agent;
 import net.agent.SchedulingAgent.Behaviour.GetGoalOfProduction;
@@ -23,11 +25,12 @@ public class SchedulingAgent extends Agent {
      * @param mtpFileName Name of the MTP file for initializing the knowledge base.
      * @param numberofAgents Total number of agents involved in the process.
      */
-    public SchedulingAgent(String endpointUrl, String mtpFileName, int numberofAgents) {
+    public SchedulingAgent(String endpointUrl, String mtpFileName, int numberofAgents, List<AID> phoneBook) {
         internalDataModel = new InternalDataModel();
         internalDataModel.setEndpointURL(endpointUrl);
         internalDataModel.setMtpFileName(mtpFileName);
         internalDataModel.setNumberofAgents(numberofAgents);
+        internalDataModel.setPhoneBook(phoneBook);
     }
 
     /**
@@ -66,7 +69,9 @@ public class SchedulingAgent extends Agent {
         addBehaviour(new GetGoalOfProduction(this));
         
         // Initialize phonebook with other agents
-        initializePhoneBook();
+        initializePhoneBook2();
+        
+        
     }
 
     /**
@@ -80,4 +85,23 @@ public class SchedulingAgent extends Agent {
             }
         }
     }
+    
+    /**
+     * Initializes the phone book for communication between agents if not already initialized.
+     */
+    private void initializePhoneBook2() {
+        // Check if the phone book is already initialized
+        if (internalDataModel.getPhoneBook() == null || internalDataModel.getPhoneBook().isEmpty()) {
+            // Initialize the phone book only if it's not already initialized
+            for (int i = 1; i <= internalDataModel.getNumberofAgents(); i++) {
+                AID agentAID = new AID(String.valueOf(i), AID.ISLOCALNAME);
+                // Check if the current agent is not the same as this agent
+                if (!agentAID.equals(getAID())) {
+                    internalDataModel.addAID2PhoneBook(agentAID);
+                }
+            }
+        }
+    }
+
+
 }

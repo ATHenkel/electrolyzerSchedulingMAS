@@ -11,8 +11,9 @@ import net.agent.SchedulingAgent.SchedulingAgent;
  * It extends OneShotBehaviour, meaning it will execute its task once per invocation.
  */
 public class ProductionDataBroadcaster extends OneShotBehaviour {
-
-    private SchedulingAgent schedulingAgent;
+	private static final long serialVersionUID = 1024866020762733748L;
+	
+	private SchedulingAgent schedulingAgent;
 
     /**
      * Constructor to initialize the ProductionDataBroadcaster with its scheduling agent.
