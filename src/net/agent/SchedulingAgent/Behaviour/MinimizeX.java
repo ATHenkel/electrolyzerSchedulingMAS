@@ -111,7 +111,6 @@ public class MinimizeX extends OneShotBehaviour {
 
 			// Check, if this electrolyzer should be set to standby
 			if (extractAgentNumber(this.schedulingAgent.getLocalName()) == nextShutdownElectrolyzer) {
-				int number = extractAgentNumber(this.schedulingAgent.getLocalName());
 				System.err.println("Agent: " + this.schedulingAgent.getLocalName() + " Standby-Activated!");
 				
 				// Activate Standby

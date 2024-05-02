@@ -44,7 +44,7 @@ public class DualUpdate extends OneShotBehaviour {
                       shutdownElectrolyzer + ";" + stateProduction + ";" + stateStandby;
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
-            if (iteration == 0 && period == 1 && Integer.valueOf(this.schedulingAgent.getLocalName()) == 1) {
+            if (iteration == 0 && period == 1 && extractAgentNumber(this.schedulingAgent.getLocalName()) == 1) {
                 header = "Agent;Period;Iteration;Own Production;Received Production;Demand;X;Z;Gradient;Lambda;Demand Deviation %;Current Time;Shutdown Order Index;Shutdown Electrolyzer;State Production;State Standby";
                 writer.write(header);
                 writer.newLine();
@@ -55,6 +55,31 @@ public class DualUpdate extends OneShotBehaviour {
             e.printStackTrace();
         }
     }
+    
+	/**
+	 * Extracts the agent number from the agent name.
+	 * Assumes that the agent name follows the format "<instanceName>:PEA_Agent<number>".
+	 * @param agentName the name of the agent
+	 * @return the agent number
+	 */
+	public static int extractAgentNumber(String agentName) {
+	    // Split the agent name by ":PEA_Agent" to get the part containing the agent number
+	    String[] parts = agentName.split("--PEAAgent");
+
+	    // Check if the agent name follows the expected format
+	    if (parts.length == 2) {
+	        // Extract the agent number from the second part and convert it to an integer
+	        try {
+	            return Integer.parseInt(parts[1]);
+	        } catch (NumberFormatException e) {
+	            // If the agent number is not a valid integer, return -1 to indicate an error
+	            return -1;
+	        }
+	    } else {
+	        // If the agent name does not follow the expected format, return -1 to indicate an error
+	        return -1;
+	    }
+	}
 
     /**
      * Calculates the gradient of the Marginal Levelized Cost of Hydrogen (mLCOH).

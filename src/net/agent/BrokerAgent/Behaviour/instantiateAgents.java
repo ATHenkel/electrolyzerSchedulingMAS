@@ -46,16 +46,16 @@ public class instantiateAgents extends OneShotBehaviour {
         List<net.agent.BrokerAgent.Module> modules = loadModules();
         filterModules(modules);
         List<AID> phoneBook = createPhoneBook(modules);
-   //     initializeAgentPlatform(modules);
-        handleAMLModification(phoneBook);
-        
-        try {
-            Server_Agent.initializeAndStartServer();
-        } catch (Exception e) {
-            System.err.println("Fehler beim Starten des OPC-UA Servers: " + e.getMessage());
-        }
-        
-        System.out.println("OPC Server gestartet");
+        initializeAgentPlatform(modules);
+//        handleAMLModification(phoneBook);
+//        
+//        try {
+//            Server_Agent.initializeAndStartServer();
+//        } catch (Exception e) {
+//            System.err.println("Fehler beim Starten des OPC-UA Servers: " + e.getMessage());
+//        }
+//        
+//        System.out.println("OPC Server gestartet");
     }
 
     /**
