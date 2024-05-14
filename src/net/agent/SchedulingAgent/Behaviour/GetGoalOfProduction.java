@@ -48,14 +48,13 @@ public class GetGoalOfProduction extends OneShotBehaviour {
         shutdownOrderList.add(6);
         shutdownOrderList.add(7);
         shutdownOrderList.add(8);
-        System.out.println("Shutdown order list initialized with values for agent " + schedulingAgent.getLocalName());
     }
 
     /**
      * Establishes a connection to the SQL database and reads necessary data.
      */
     private void connectAndReadFromDatabase() {
-        System.out.println("Agent " + schedulingAgent.getLocalName() + " connecting to SQL database...");
+        System.out.println("Agent " + schedulingAgent.getLocalName() + " connecting to SQL database");
         SQLDatabaseConnector connector = new SQLDatabaseConnector(schedulingAgent);
         connector.readDataFromDatabase();
     }

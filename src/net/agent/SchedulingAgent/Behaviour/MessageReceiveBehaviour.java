@@ -97,9 +97,6 @@ public class MessageReceiveBehaviour extends CyclicBehaviour {
 					// Set and Reset Values
 					this.schedulingAgent.getInternalDataModel().setReceiveMessages(false);
 					this.schedulingAgent.getInternalDataModel().setCountReceivedMessages(0);
-					//TODO: Wofür wird das setSumProduction hier benötigt? 
-					//this.schedulingAgent.getInternalDataModel().setSumProduction(sumProduction);
-					//System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Period:" + period+ " Iteration" + iteration + " sumProduction" + sumProduction);
 					this.schedulingAgent.getInternalDataModel().addReceivedProductionQuantity(period, iteration,
 							sumProduction);
 

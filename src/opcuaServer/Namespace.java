@@ -127,8 +127,8 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 				return; // Exit if type is not supported
 			}
 
-			System.out.println("Setting node " + identifier + " with value " + initialObject + " of type "
-					+ initialObject.getClass().getSimpleName());
+//			System.out.println("Setting node " + identifier + " with value " + initialObject + " of type "
+//					+ initialObject.getClass().getSimpleName());
 		} catch (NumberFormatException e) {
 			System.err.println("Error parsing initial value for " + identifier + ": " + e.getMessage());
 			return;

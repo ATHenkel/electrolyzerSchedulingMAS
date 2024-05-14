@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,13 +59,21 @@ public class instantiateAgents extends OneShotBehaviour {
         //Start the OPC-Server
         Server.initializeAndStartServer()
         .thenRun(() -> {
-            System.out.println("OPC-server successfully started");
+            // Wait for user input to continue
+            System.out.println("Press 'enter' to initialize agent platform.");
+            Scanner scanner = new Scanner(System.in);
+            while (!scanner.nextLine().equals("enter")) {
+                System.out.println("Please press 'enter' to continue.");
+            }
+            scanner.close();
+
             initializeAgentPlatform(modules);
         })
         .exceptionally(e -> {
             System.err.println("Error when starting the OPC-UA server: " + e.getMessage());
             return null;
         });
+
     }
 
     /**

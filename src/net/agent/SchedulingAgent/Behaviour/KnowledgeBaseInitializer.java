@@ -59,8 +59,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setPEL(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Stack-Power successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Stack-Power successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Stack-Power' is not a String");
@@ -76,8 +76,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setCapEx(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName() + " CapEx of "
-								+ Double.parseDouble((String) value) + "€ successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName() + " CapEx of "
+//								+ Double.parseDouble((String) value) + "€ successfully initialized");
 					} else {
 
 						System.err.println(this.schedulingAgent.getLocalName()
@@ -94,8 +94,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setOMFactor(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " OM-Costs successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " OM-Costs successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'OM-Costs' is not a String");
@@ -112,8 +112,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel()
 								.setUtilizationtime(Integer.parseInt((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Utilization-Time successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Utilization-Time successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Utilization-Time' is not a String");
@@ -129,8 +129,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setLoadFactor(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Load-Factor successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Load-Factor successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Load-Factor' is not a String");
@@ -146,8 +146,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setDiscountrate(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Discount-Rate successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Discount-Rate successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Discount-Rate' is not a String");
@@ -163,8 +163,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setMinPower(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Operating-Limit-Low successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Operating-Limit-Low successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Operation-Limit-Low' is not a String");
@@ -180,8 +180,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					Object value = property.getValue();
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel().setMaxPower(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Operating-Limit-High successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Operating-Limit-High successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Operation-Limit-High' is not a String");
@@ -198,8 +198,8 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 					if (value instanceof String) {
 						this.schedulingAgent.getInternalDataModel()
 								.setStartUpDuration(Double.parseDouble((String) value));
-						System.out.println(this.schedulingAgent.getLocalName()
-								+ " Cold-Start-Time successfully initialized");
+//						System.out.println(this.schedulingAgent.getLocalName()
+//								+ " Cold-Start-Time successfully initialized");
 					} else {
 						System.err.println(this.schedulingAgent.getLocalName()
 								+ " Error: Property 'Cold-Start-Time' is not a String");
@@ -250,22 +250,21 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 							SSR += Math.pow(point.getY() - predictedY, 2);
 							SST += Math.pow(point.getY() - meanY, 2);
 						}
-						double rSquared = 1.0 - (SSR / SST);
-
+//						double rSquared = 1.0 - (SSR / SST);
 						// Coefficient output
-						System.out.println("Coefficients of the quadratic approximation:");
-						for (int i = 0; i < coefficients.length; i++) {
-							System.out.println("Coefficient " + i + ": " + coefficients[i]);
-						}
-						System.out.println("----------------------");
-						System.out.println("R^2-Value: " + rSquared);
+//						System.out.println("Coefficients of the quadratic approximation:");
+//						for (int i = 0; i < coefficients.length; i++) {
+//							System.out.println("Coefficient " + i + ": " + coefficients[i]);
+//						}
+//						System.out.println("----------------------");
+//						System.out.println("R^2-Value: " + rSquared);
 
 						// Set Coefficient f(x) = A*x^2 + B*x + C
 						this.schedulingAgent.getInternalDataModel().setProductionCoefficientA(coefficients[2]);
 						this.schedulingAgent.getInternalDataModel().setProductionCoefficientB(coefficients[1]);
 						this.schedulingAgent.getInternalDataModel().setProductionCoefficientC(coefficients[0]);
 
-						System.out.println("Production-Curve-Data successfully initialized");
+//						System.out.println("Production-Curve-Data successfully initialized");
 					} else {
 						System.err.println("Error: Property 'Production-Curve-Data' is not a List");
 					}

@@ -124,19 +124,7 @@ public class Server {
 		return amlElements;
 	}
 
-//    public static void initializeAndStartServer() throws Exception {     
-//        init();
-//        startup().get();
-//        
-//        // Wait for the server shutdown
-//        final CompletableFuture<Void> future = new CompletableFuture<>();
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> future.complete(null)));
-//        future.get();
-//        
-//        System.out.println("OPC-UA Server started successfully.");
-//    }
-    
-    public static CompletableFuture<Void> initializeAndStartServer() {
+      public static CompletableFuture<Void> initializeAndStartServer() {
         try {
             init(); // Initialisiert den Server, falls noch nicht geschehen
         } catch (Exception e) {

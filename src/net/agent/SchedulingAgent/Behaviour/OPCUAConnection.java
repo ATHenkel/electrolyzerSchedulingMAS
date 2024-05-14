@@ -80,75 +80,9 @@ import net.agent.SchedulingAgent.SchedulingAgent;
 		}
 
 		// Next Behaviour to be executed
-		System.out.println("Agent " + this.schedulingAgent.getLocalName()  + " add SetpointUpdater Behaviour");
 		schedulingAgent.addBehaviour(new SetpointUpdater(schedulingAgent));
 	}
 }
  
- /*
-public class OPCUAConnection extends OneShotBehaviour {
-	private static final long serialVersionUID = 1L;
-	
-	private SchedulingAgent schedulingAgent;
 
-    public OPCUAConnection(SchedulingAgent schedulingAgent) {
-        this.schedulingAgent = schedulingAgent;
-    }
-
-    @Override
-    public void action() {
-        String endpointURL = schedulingAgent.getInternalDataModel().getEndpointURL();
-        initializeLogger();
-        URI uri = parseEndpointURL(endpointURL);
-
-        try {
-            List<EndpointDescription> endpoints = discoverServerEndpoints(endpointURL, uri);
-            setupClientConfig(endpoints, uri);
-            connectToServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        schedulingAgent.addBehaviour(new SetpointUpdater(schedulingAgent));
-    }
-
-    private void initializeLogger() {
-        Configurator.initialize(new DefaultConfiguration());
-        Configurator.setRootLevel(Level.INFO);
-    }
-
-    private URI parseEndpointURL(String endpointURL) {
-        try {
-            return new URI(endpointURL);
-        } catch (URISyntaxException e) {
-            System.err.println("Invalid URI: " + endpointURL);
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private List<EndpointDescription> discoverServerEndpoints(String endpointURL, URI uri) throws Exception {
-        List<EndpointDescription> endpoints = DiscoveryClient.getEndpoints(endpointURL).get();
-        schedulingAgent.getInternalDataModel().setEndpoints(endpoints);
-        return endpoints;
-    }
-
-    private void setupClientConfig(List<EndpointDescription> endpoints, URI uri) throws Exception {
-        EndpointDescription configPoint = EndpointUtil.updateUrl(endpoints.get(0), uri.getHost(), uri.getPort());
-        schedulingAgent.getInternalDataModel().setConfigPoint(configPoint);
-        
-        OpcUaClientConfigBuilder cfg = new OpcUaClientConfigBuilder();
-        cfg.setEndpoint(configPoint);
-        schedulingAgent.getInternalDataModel().getCfg().setEndpoint(configPoint);
-    }
-
-    private void connectToServer() throws Exception {
-        OpcUaClient client = OpcUaClient.create(schedulingAgent.getInternalDataModel().getCfg().build());
-        client.connect().get();
-        AddressSpace addressSpace = client.getAddressSpace();
-        schedulingAgent.getInternalDataModel().setAddressSpace(addressSpace);
-        System.out.println("PEA-Agent:" + schedulingAgent.getLocalName() + " connected to OPC-UA MTP-Server");
-    }
-}
-*/
 

@@ -79,7 +79,6 @@ public class GatherProductionData extends OneShotBehaviour {
 	     */
 		if (Math.abs(demandDeviation) < epsilonProduction) {
 			periodScheduled = true;
-			//TODO: Hier Ausgabe auskommentiert 
 			System.out.println("--------");
 			System.out.println("Agent: " + this.schedulingAgent.getLocalName() + " Periode "
 					+ this.schedulingAgent.getInternalDataModel().getCurrentPeriod() + " Iteration: "
