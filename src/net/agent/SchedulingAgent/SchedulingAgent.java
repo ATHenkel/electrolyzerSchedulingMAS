@@ -54,8 +54,6 @@ public class SchedulingAgent extends Agent {
      */
     @Override
     protected void setup() {
-        System.out.println(getLocalName() + ": Starting setup.");
-        
         // Add cyclic behavior for receiving messages
         addBehaviour(new MessageReceiveBehaviour(this));
         
@@ -63,33 +61,22 @@ public class SchedulingAgent extends Agent {
         addBehaviour(new KnowledgeBaseInitializer(this));
         
         // Establish OPC-UA connection
-//        addBehaviour(new OPCUAConnection(this));
+        if (extractAgentNumber(this.getLocalName()) == 1) {
+        	addBehaviour(new OPCUAConnection(this));
+		}
+       //addBehaviour(new OPCUAConnection(this));
         
         // Obtain production goals from the DSM system
         addBehaviour(new GetGoalOfProduction(this));
         
         // Initialize phonebook with other agents
-        initializePhoneBook2();
-        
-        
-    }
-
-    /**
-     * Initializes the phone book for communication between agents.
-     */
-    private void initializePhoneBook() {
-        for (int i = 1; i <= internalDataModel.getNumberofAgents(); i++) {
-            AID agentAID = new AID(String.valueOf(i), AID.ISLOCALNAME);
-            if (!agentAID.equals(getAID())) {
-                internalDataModel.addAID2PhoneBook(agentAID);
-            }
-        }
+        initializePhoneBook();
     }
     
     /**
      * Initializes the phone book for communication between agents if not already initialized.
      */
-    private void initializePhoneBook2() {
+    private void initializePhoneBook() {
         // Check if the phone book is already initialized
         if (internalDataModel.getPhoneBook() == null || internalDataModel.getPhoneBook().isEmpty()) {
             // Initialize the phone book only if it's not already initialized
@@ -102,6 +89,29 @@ public class SchedulingAgent extends Agent {
             }
         }
     }
+    
+	/**
+	 * Extracts the agent number from the agent name.
+	 * Assumes that the agent name follows the format "<instanceName>:PEA_Agent<number>".
+	 * @param agentName the name of the agent
+	 * @return the agent number
+	 */
+	public static int extractAgentNumber(String agentName) {
+	    // Split the agent name by ":PEA_Agent" to get the part containing the agent number
+	    String[] parts = agentName.split("--PEAAgent");
 
-
+	    // Check if the agent name follows the expected format
+	    if (parts.length == 2) {
+	        // Extract the agent number from the second part and convert it to an integer
+	        try {
+	            return Integer.parseInt(parts[1]);
+	        } catch (NumberFormatException e) {
+	            // If the agent number is not a valid integer, return -1 to indicate an error
+	            return -1;
+	        }
+	    } else {
+	        // If the agent name does not follow the expected format, return -1 to indicate an error
+	        return -1;
+	    }
+	}
 }

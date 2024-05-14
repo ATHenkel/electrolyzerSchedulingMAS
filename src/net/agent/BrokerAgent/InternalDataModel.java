@@ -14,8 +14,9 @@ import jade.core.AID;
  * Internal data model of Broker-Agent for storing agent configurations and managing shared resources.
  */
 public class InternalDataModel extends AbstractUserObject {
-
-    private OpcUaClient opcUaClient;
+	private static final long serialVersionUID = 5964943261619302454L;
+	
+	private OpcUaClient opcUaClient;
     private List<EndpointDescription> endpoints;
     private OpcUaClientConfigBuilder cfg;
     private EndpointDescription configPoint;

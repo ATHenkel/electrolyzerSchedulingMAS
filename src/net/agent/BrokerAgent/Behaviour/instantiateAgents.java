@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -46,16 +49,22 @@ public class instantiateAgents extends OneShotBehaviour {
         List<net.agent.BrokerAgent.Module> modules = loadModules();
         filterModules(modules);
         List<AID> phoneBook = createPhoneBook(modules);
-        initializeAgentPlatform(modules);
-//        handleAMLModification(phoneBook);
-//        
-//        try {
-//            Server_Agent.initializeAndStartServer();
-//        } catch (Exception e) {
-//            System.err.println("Fehler beim Starten des OPC-UA Servers: " + e.getMessage());
-//        }
-//        
-//        System.out.println("OPC Server gestartet");
+        handleAMLModification(phoneBook);
+        
+        //Deactivate Logger-Notification
+        Logger logger = LoggerFactory.getLogger("opcuaServer.AttributeLoggingFilter");
+        ((ch.qos.logback.classic.Logger) logger).setLevel(Level.OFF);
+        
+        //Start the OPC-Server
+        Server.initializeAndStartServer()
+        .thenRun(() -> {
+            System.out.println("OPC-server successfully started");
+            initializeAgentPlatform(modules);
+        })
+        .exceptionally(e -> {
+            System.err.println("Error when starting the OPC-UA server: " + e.getMessage());
+            return null;
+        });
     }
 
     /**
@@ -147,7 +156,7 @@ public class instantiateAgents extends OneShotBehaviour {
         for (int i = 0; i < phoneBook.size(); i++) {
             String mtpFileName = modules.get(i).visibleName + ".mtp";
             AID agentAID = phoneBook.get(i);
-            SchedulingAgent schedulingAgent = new SchedulingAgent(agentAID.getLocalName(), mtpFileName, modules.size(), phoneBook);
+            SchedulingAgent schedulingAgent = new SchedulingAgent("opc.tcp://127.0.0.1:4200", mtpFileName, modules.size(), phoneBook);
             try {
                 container.acceptNewAgent(agentAID.getLocalName(), schedulingAgent).start();
                 System.out.println("PEA-agent named " + agentAID.getLocalName() + " was instantiated and started.");

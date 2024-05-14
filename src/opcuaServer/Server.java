@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -24,28 +25,12 @@ import caex.CAEXFile;
 public class Server {
 
     private static final int TCP_BIND_PORT = 4200;
-    private final OpcUaServer server;
-    private final Namespace customNamespace;
-	private String filePath;
-    
-//    public static void main(String[] args) throws Exception {
-//    	
-//    	// Save default values
-//        GlobalStorage.getDefaultValueFromOpcUaNode();
-//
-//        // Start Server
-//        Server server = new Server(filePath2);
-//        server.startup().get();
-//
-//        // Wait for the server shutdown
-//        final CompletableFuture<Void> future = new CompletableFuture<>();
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> future.complete(null)));
-//        future.get();
-//    }
-	
+    private static OpcUaServer server;
+    private static Namespace customNamespace;
+    private static String filePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\MTP-Template\\out\\Manifest.aml";
 
-    public Server(String filePath) throws Exception {
-    	this.filePath = filePath; // Speichern des übergebenen Pfades
+    // Diese Methode initialisiert die statische Instanz
+    public static void init() throws Exception {
         OpcUaServerConfig serverConfig = OpcUaServerConfig.builder()
             .setApplicationName(LocalizedText.english("MTP-Server"))
             .setApplicationUri("urn:example:server")
@@ -54,13 +39,13 @@ public class Server {
         server = new OpcUaServer(serverConfig);
         customNamespace = new Namespace(server);
     }
-    
-    private Set<EndpointConfiguration> createEndpointConfigurations() {
+
+    private static Set<EndpointConfiguration> createEndpointConfigurations() {
         EndpointConfiguration endpointConfiguration = new EndpointConfiguration.Builder()
             .setBindAddress("localhost")
             .setBindPort(TCP_BIND_PORT)
             .setHostname("localhost")
-            .setPath("/milo")
+            .setPath("") //removed \milo
             .setSecurityMode(MessageSecurityMode.None)
             .setSecurityPolicy(SecurityPolicy.None)
             .build();
@@ -68,38 +53,36 @@ public class Server {
         return Set.of(endpointConfiguration);
     }
 
-    public CompletableFuture<Void> startup() {
+    public static CompletableFuture<Void> startup() {
         UaFolderNode parentNode = customNamespace.getParentFolderNode();
 
         return server.startup().thenRun(() -> {
-        	customNamespace.startup();
+            customNamespace.startup();
 
-            // Get Manifest.aml file
-    		File xmlfile = new File(filePath);
-    		CAEXFile manifestAML = loadFromXmlFile(xmlfile);
-    		AMLImport.getInternalElements(manifestAML);
-    		
-    		// Get OpcUaNodes from Manifest.aml file
-    		AMLImport.getOpcUaNodes(manifestAML); 
+            // Laden und Verarbeiten der Manifest.aml
+            File xmlfile = new File(filePath);
+            CAEXFile manifestAML = loadFromXmlFile(xmlfile);
+            AMLImport.getInternalElements(manifestAML);
+            AMLImport.getOpcUaNodes(manifestAML);
             Map<String, String> opcUaNodes = GlobalStorage.getOpcUaNodes();
-                    
-            // Call the method to get default values based on OPC UA Nodes
-            GlobalStorage.getDefaultValueFromOpcUaNode();
-           
-            // Create the nodes based on the data from GlobalStorage
+
+            // Knoten basierend auf den gespeicherten Daten erstellen
             opcUaNodes.forEach((identifier, nodeName) -> {
                 // Retrieving the default value from GlobalStorage
+            	GlobalStorage.getDefaultValueFromOpcUaNode();
                 String defaultValue = GlobalStorage.getDefaultValue(identifier);
                 Object initialValue = defaultValue != null ? defaultValue : determineFallbackInitialValue(); // Fallback, falls kein Default-Wert vorhanden ist
-                
-                // Create the nodes based on the identifier
                 customNamespace.createNodeBasedOnIdentifier(parentNode, nodeName, initialValue);
             });
         });
     }
     
-      
-	public static CAEXFile loadFromXmlFile(File file) {
+    private static Object determineFallbackInitialValue() {
+        return false; // oder ein anderer geeigneter Standardwert
+    }
+    
+    
+    public static CAEXFile loadFromXmlFile(File file) {
 		CAEXFile amlElements = null;
 		
 		if (file.exists()) {
@@ -140,23 +123,37 @@ public class Server {
 		}
 		return amlElements;
 	}
+
+//    public static void initializeAndStartServer() throws Exception {     
+//        init();
+//        startup().get();
+//        
+//        // Wait for the server shutdown
+//        final CompletableFuture<Void> future = new CompletableFuture<>();
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> future.complete(null)));
+//        future.get();
+//        
+//        System.out.println("OPC-UA Server started successfully.");
+//    }
     
-    private Object determineFallbackInitialValue() {
-        return false; // oder ein anderer geeigneter Standardwert
-    }
-    
-    public void initializeAndStartServer() throws Exception {     
-    	
-    	String pathString = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\MTP-Template\\out\\Manifest.aml";
-    	Server server = new Server(pathString);
-        server.startup().get();
+    public static CompletableFuture<Void> initializeAndStartServer() {
+        try {
+            init(); // Initialisiert den Server, falls noch nicht geschehen
+        } catch (Exception e) {
+            CompletableFuture<Void> failedFuture = new CompletableFuture<>();
+            failedFuture.completeExceptionally(e);
+            return failedFuture;
+        }
         
-        // Wait for the server shutdown
-        final CompletableFuture<Void> future = new CompletableFuture<>();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> future.complete(null)));
-        future.get();
-        
-        System.out.println("OPC-UA Server started successfully.");
+        return startup().thenRun(() -> {
+            // Server erfolgreich gestartet
+            System.out.println("OPC-UA Server started successfully.");
+        }).exceptionally(ex -> {
+            System.err.println("Error starting the OPC-UA server: " + ex.getMessage());
+            return null;
+        });
     }
 
+
 }
+

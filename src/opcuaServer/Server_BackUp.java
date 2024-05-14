@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import opcuaServer.*;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -23,15 +21,31 @@ import org.eclipse.milo.opcua.stack.server.EndpointConfiguration;
 
 import caex.CAEXFile;
 
-public class Server_Agent {
+public class Server_BackUp {
 
     private static final int TCP_BIND_PORT = 4200;
-    private static OpcUaServer server;
-    private static Namespace customNamespace;
-    private static String filePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\MTP-Template\\out\\Manifest.aml";
+    private final OpcUaServer server;
+    private final Namespace customNamespace;
+	private String filePath;
+    
+//    public static void main(String[] args) throws Exception {
+//    	
+//    	// Save default values
+//        GlobalStorage.getDefaultValueFromOpcUaNode();
+//
+//        // Start Server
+//        Server server = new Server(filePath2);
+//        server.startup().get();
+//
+//        // Wait for the server shutdown
+//        final CompletableFuture<Void> future = new CompletableFuture<>();
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> future.complete(null)));
+//        future.get();
+//    }
+	
 
-    // Diese Methode initialisiert die statische Instanz
-    public static void init() throws Exception {
+    public Server_BackUp(String filePath) throws Exception {
+    	this.filePath = filePath; // Speichern des übergebenen Pfades
         OpcUaServerConfig serverConfig = OpcUaServerConfig.builder()
             .setApplicationName(LocalizedText.english("MTP-Server"))
             .setApplicationUri("urn:example:server")
@@ -40,8 +54,8 @@ public class Server_Agent {
         server = new OpcUaServer(serverConfig);
         customNamespace = new Namespace(server);
     }
-
-    private static Set<EndpointConfiguration> createEndpointConfigurations() {
+    
+    private Set<EndpointConfiguration> createEndpointConfigurations() {
         EndpointConfiguration endpointConfiguration = new EndpointConfiguration.Builder()
             .setBindAddress("localhost")
             .setBindPort(TCP_BIND_PORT)
@@ -54,36 +68,38 @@ public class Server_Agent {
         return Set.of(endpointConfiguration);
     }
 
-    public static CompletableFuture<Void> startup() {
+    public CompletableFuture<Void> startup() {
         UaFolderNode parentNode = customNamespace.getParentFolderNode();
 
         return server.startup().thenRun(() -> {
-            customNamespace.startup();
+        	customNamespace.startup();
 
-            // Laden und Verarbeiten der Manifest.aml
-            File xmlfile = new File(filePath);
-            CAEXFile manifestAML = loadFromXmlFile(xmlfile);
-            AMLImport.getInternalElements(manifestAML);
-            AMLImport.getOpcUaNodes(manifestAML);
+            // Get Manifest.aml file
+    		File xmlfile = new File(filePath);
+    		CAEXFile manifestAML = loadFromXmlFile(xmlfile);
+    		AMLImport.getInternalElements(manifestAML);
+    		
+    		// Get OpcUaNodes from Manifest.aml file
+    		AMLImport.getOpcUaNodes(manifestAML); 
             Map<String, String> opcUaNodes = GlobalStorage.getOpcUaNodes();
-
-            // Knoten basierend auf den gespeicherten Daten erstellen
+                    
+            // Call the method to get default values based on OPC UA Nodes
+            GlobalStorage.getDefaultValueFromOpcUaNode();
+           
+            // Create the nodes based on the data from GlobalStorage
             opcUaNodes.forEach((identifier, nodeName) -> {
                 // Retrieving the default value from GlobalStorage
-            	GlobalStorage.getDefaultValueFromOpcUaNode();
                 String defaultValue = GlobalStorage.getDefaultValue(identifier);
                 Object initialValue = defaultValue != null ? defaultValue : determineFallbackInitialValue(); // Fallback, falls kein Default-Wert vorhanden ist
+                
+                // Create the nodes based on the identifier
                 customNamespace.createNodeBasedOnIdentifier(parentNode, nodeName, initialValue);
             });
         });
     }
     
-    private static Object determineFallbackInitialValue() {
-        return false; // oder ein anderer geeigneter Standardwert
-    }
-    
-    
-    public static CAEXFile loadFromXmlFile(File file) {
+      
+	public static CAEXFile loadFromXmlFile(File file) {
 		CAEXFile amlElements = null;
 		
 		if (file.exists()) {
@@ -124,10 +140,16 @@ public class Server_Agent {
 		}
 		return amlElements;
 	}
-
-    public static void initializeAndStartServer() throws Exception {     
-        init();
-        startup().get();
+    
+    private Object determineFallbackInitialValue() {
+        return false; // oder ein anderer geeigneter Standardwert
+    }
+    
+    public void initializeAndStartServer() throws Exception {     
+    	
+    	String pathString = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\MTP-Template\\out\\Manifest.aml";
+    	Server_BackUp server = new Server_BackUp(pathString);
+        server.startup().get();
         
         // Wait for the server shutdown
         final CompletableFuture<Void> future = new CompletableFuture<>();
@@ -138,4 +160,3 @@ public class Server_Agent {
     }
 
 }
-

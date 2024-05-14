@@ -133,7 +133,7 @@ public class MonitorElectrolyzerState extends TickerBehaviour {
             
             
             //TODO: Test for Agent 1 und 3
-			if (schedulingComplete && agentId == 1 || agentId == 3) {
+			if (schedulingComplete && agentId == 1) {
 				if (nextPeriod <= numberScheduledPeriods) {
 					
 			        //Check if new value must be written to the PLC in case of TimeDifference
