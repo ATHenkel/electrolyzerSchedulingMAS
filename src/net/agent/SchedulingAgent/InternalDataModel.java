@@ -25,13 +25,23 @@ public class InternalDataModel extends AbstractUserObject {
 	// Global configuration and state variables
 	private LocalDateTime lastScheduleWriteTime = LocalDateTime.of(1970, 1, 1, 0, 0); //Create variable to measure time and initialize with outdated values
 	
-	// OPC UA specific attributes
+	// OPC UA specific attributes for transferring optimized setpoints
 	private String endpointURL;
 	private OpcUaClient opcUaClient;
 	private List<EndpointDescription> endpoints;
 	private OpcUaClientConfigBuilder cfg;
 	private EndpointDescription configPoint;
 	private AddressSpace addressSpace;
+	
+	// OPC UA specific attributes for monitoring PEA 
+	private String peaEndpointURL;
+	private OpcUaClient peaOpcUaClient;
+	private List<EndpointDescription> peaEndpoints;
+	private OpcUaClientConfigBuilder peaCfg;
+	private EndpointDescription peaConfigPoint;
+	private AddressSpace peaAddressSpace;
+	
+	//Information regarding the communication with the PLC of the PEA 
 	private int schedulingResultNextPeriod = 0; //Defines the period with which the PLC was last communicated the scheduling results
 	private boolean headerWritten = true; //Boolean variable to make sure that header will be written only 1x 
 	private int counter;
@@ -240,22 +250,6 @@ public class InternalDataModel extends AbstractUserObject {
 	 */
 	public void setMtpFileName(String mtpFileName) {
 	    this.mtpFileName = mtpFileName;
-	}
-
-	/**
-	 * Gets the endpoint URL for the OPC UA connection.
-	 * @return the endpoint URL
-	 */
-	public String getEndpointURL() {
-	    return endpointURL;
-	}
-
-	/**
-	 * Sets the endpoint URL for the OPC UA connection.
-	 * @param endpointURL the new endpoint URL
-	 */
-	public void setEndpointURL(String endpointURL) {
-	    this.endpointURL = endpointURL;
 	}
 
 	/**
@@ -706,6 +700,30 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	// ---- OPC UA Communication ----
+	
+	/**
+	 * Gets the endpoint URL for the OPC UA connection.
+	 * @return the endpoinst URL
+	 */
+	public String getEndpointURL() {
+	    return endpointURL;
+	}
+	
+	public String getPeaEndpointURL() {
+	    return peaEndpointURL;
+	}
+
+	/**
+	 * Sets the endpoint URL for the OPC UA connection.
+	 * @param endpointURL the new endpoint URL
+	 */
+	public void setEndpointURL(String endpointURL) {
+	    this.endpointURL = endpointURL;
+	}
+	
+	public void setPeaEndpointURL(String peaEndpointURL) {
+	    this.peaEndpointURL = peaEndpointURL;
+	}
 
 	/**
 	 * Retrieves the OPC UA client instance.
@@ -715,12 +733,20 @@ public class InternalDataModel extends AbstractUserObject {
 	    return opcUaClient;
 	}
 
+	public OpcUaClient getPeaOpcUaClient() {
+		return peaOpcUaClient;
+	}
+
 	/**
 	 * Sets the OPC UA client instance.
 	 * @param opcUaClient the OPC UA client to be set.
 	 */
 	public void setOpcUaClient(OpcUaClient opcUaClient) {
 	    this.opcUaClient = opcUaClient;
+	}
+
+	public void setPeaOpcUaClient(OpcUaClient client) {
+		this.peaOpcUaClient = client;
 	}
 
 	/**
@@ -733,6 +759,13 @@ public class InternalDataModel extends AbstractUserObject {
 	    }
 	    return endpoints;
 	}
+	
+	public List<EndpointDescription> getPeaEndpoints() {
+	    if (peaEndpoints == null) {
+	        peaEndpoints = new ArrayList<>();
+	    }
+	    return peaEndpoints;
+	}
 
 	/**
 	 * Sets the list of endpoint descriptions.
@@ -742,12 +775,20 @@ public class InternalDataModel extends AbstractUserObject {
 	    this.endpoints = endpoints;
 	}
 
+	public void setPeaEndpoints(List<EndpointDescription> endpoints) {
+		this.peaEndpoints = endpoints;
+	}
+
 	/**
 	 * Retrieves the configuration point for the OPC UA connection.
 	 * @return the configuration point.
 	 */
 	public EndpointDescription getConfigPoint() {
 	    return configPoint;
+	}
+	
+	public EndpointDescription getPeaConfigPoint() {
+	    return peaConfigPoint;
 	}
 
 	/**
@@ -757,6 +798,10 @@ public class InternalDataModel extends AbstractUserObject {
 	public void setConfigPoint(EndpointDescription configPoint) {
 	    this.configPoint = configPoint;
 	}
+	
+	public void setPeaConfigPoint(EndpointDescription peaConfigPoint) {
+	    this.peaConfigPoint = peaConfigPoint;
+	}
 
 	/**
 	 * Retrieves the OPC UA client's address space.
@@ -765,6 +810,10 @@ public class InternalDataModel extends AbstractUserObject {
 	public AddressSpace getAddressSpace() {
 	    return addressSpace;
 	}
+	
+	public AddressSpace getPeaAddressSpace() {
+	    return peaAddressSpace;
+	}
 
 	/**
 	 * Sets the OPC UA client's address space.
@@ -772,6 +821,10 @@ public class InternalDataModel extends AbstractUserObject {
 	 */
 	public void setAddressSpace(AddressSpace addressSpace) {
 	    this.addressSpace = addressSpace;
+	}
+	
+	public void setPeaAddressSpace(AddressSpace peaAddressSpace) {
+	    this.peaAddressSpace = peaAddressSpace;
 	}
 
 	/**
@@ -784,6 +837,13 @@ public class InternalDataModel extends AbstractUserObject {
 	    }
 	    return cfg;
 	}
+	
+	public OpcUaClientConfigBuilder getPeaCfg() {
+	    if (peaCfg == null) {
+	        peaCfg = new OpcUaClientConfigBuilder();
+	    }
+	    return peaCfg;
+	}
 
 	/**
 	 * Sets the OPC UA client configuration builder.
@@ -793,6 +853,10 @@ public class InternalDataModel extends AbstractUserObject {
 	    this.cfg = cfg;
 	}
 
+	public void setPeaCfg(OpcUaClientConfigBuilder peaCfg) {
+	    this.peaCfg = peaCfg;
+	}
+	
 	// ---- Message Handling ----
 
 	/**
