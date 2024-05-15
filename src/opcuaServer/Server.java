@@ -42,10 +42,10 @@ public class Server {
 
     private static Set<EndpointConfiguration> createEndpointConfigurations() {
         EndpointConfiguration endpointConfiguration = new EndpointConfiguration.Builder()
-            .setBindAddress("localhost")
+            .setBindAddress("0.0.0.0") //accept all addresses
             .setBindPort(TCP_BIND_PORT)
-            .setHostname("localhost")
-            .setPath("") //removed \milo
+            .setHostname("10.246.55.179")
+            .setPath("") //removed 
             .setSecurityMode(MessageSecurityMode.None)
             .setSecurityPolicy(SecurityPolicy.None)
             .build();

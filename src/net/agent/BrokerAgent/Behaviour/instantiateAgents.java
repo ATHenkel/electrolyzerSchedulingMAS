@@ -84,7 +84,8 @@ public class instantiateAgents extends OneShotBehaviour {
      * @return A list of {@link net.agent.BrokerAgent.Module} objects representing the modules parsed from the topology file.
      */
     private List<net.agent.BrokerAgent.Module> loadModules() {
-        String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
+      //  String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
+        String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\Electrolysis_Plant\\Topology\\ElectrolysisPlant.mtd";
         PlantTopologyParser parser = new PlantTopologyParser(brokerAgent);
         List<net.agent.BrokerAgent.Module> modules = parser.parseTopologyFile(topologyFilePath);
         brokerAgent.getInternalDataModel().setModules(modules);
@@ -107,7 +108,8 @@ public class instantiateAgents extends OneShotBehaviour {
     }
 
     private boolean isElectrolyser(net.agent.BrokerAgent.Module module) {
-        String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\MTP Lib\\" + module.visibleName + ".aml";
+       // String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\MTP Lib\\" + module.visibleName + ".aml";
+        String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\Electrolysis_Plant\\MTP Lib\\" + module.visibleName + ".aml";
         if (new File(amlFilePath).exists()) {
             return containsElectrolyserInfo(amlFilePath);
         } else {
@@ -142,7 +144,7 @@ public class instantiateAgents extends OneShotBehaviour {
      * @return A list of AIDs representing each agent in a sorted order based on the module names.
      */
     private List<AID> createPhoneBook(List<net.agent.BrokerAgent.Module> modules) {
-        // Sortiere die Module basierend auf der nummerischen Komponente im Namen
+    	// Sort the PEAs based on the numerical component in the name
         modules.sort(Comparator.comparingInt(module -> extractNumber(module.instanceName)));
 
         List<AID> phoneBook = new ArrayList<>();

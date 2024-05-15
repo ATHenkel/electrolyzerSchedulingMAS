@@ -86,7 +86,7 @@ public class OPCUAConnection extends OneShotBehaviour {
                 dataModel.setAddressSpace(addressSpace);
             }
 
-            System.out.println("Connected to OPC-UA Server at: " + endpointURL);
+            System.out.println("Agent:" + this.schedulingAgent.getLocalName() + " connected to OPC-UA Server at: " + endpointURL);
         } catch (Exception e) {
             System.err.println("Failed to connect to OPC-UA Server at: " + endpointURL);
             e.printStackTrace();
