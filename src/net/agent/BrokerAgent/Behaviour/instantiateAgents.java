@@ -85,7 +85,7 @@ public class instantiateAgents extends OneShotBehaviour {
      */
     private List<net.agent.BrokerAgent.Module> loadModules() {
       //  String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
-        String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\Electrolysis_Plant\\Topology\\ElectrolysisPlant.mtd";
+        String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Dtec-ElectrolysisPlant\\Topology\\ElectrolysisPlant.mtd";
         PlantTopologyParser parser = new PlantTopologyParser(brokerAgent);
         List<net.agent.BrokerAgent.Module> modules = parser.parseTopologyFile(topologyFilePath);
         brokerAgent.getInternalDataModel().setModules(modules);
@@ -109,7 +109,7 @@ public class instantiateAgents extends OneShotBehaviour {
 
     private boolean isElectrolyser(net.agent.BrokerAgent.Module module) {
        // String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\MTP Lib\\" + module.visibleName + ".aml";
-        String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\Electrolysis_Plant\\MTP Lib\\" + module.visibleName + ".aml";
+        String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Dtec-ElectrolysisPlant\\MTP Lib\\" + module.visibleName + ".aml";
         if (new File(amlFilePath).exists()) {
             return containsElectrolyserInfo(amlFilePath);
         } else {
@@ -196,9 +196,10 @@ public class instantiateAgents extends OneShotBehaviour {
 
             // Füge für jeden Agenten die _State und _Setpoint Variablen hinzu
             for (AID aid : phoneBook) {
-                String baseName = aid.getLocalName().split(":")[0]; // Extrahiere den Basisnamen aus dem Agenten-Namen
-                AMLSectionGenerator.addSetpointToAML(targetPath.toString(), baseName + "_State", true, false);
-                AMLSectionGenerator.addSetpointToAML(targetPath.toString(), baseName + "_Setpoint", false, true);
+               // String baseName = aid.getLocalName().split(":")[0]; // Extrahiere den Basisnamen aus dem Agenten-Namen
+            	String baseName = aid.getLocalName().split("--PEAAgent")[0]; // Split the local name at "--PEAAgent"
+                AMLSectionGenerator.addSetpointToAML(targetPath.toString(), baseName + "_OptimizedState", true, false);
+                AMLSectionGenerator.addSetpointToAML(targetPath.toString(), baseName + "_OptimizedSetpoint", false, true);
             }
 
             System.out.println("File successfully copied and modified.");

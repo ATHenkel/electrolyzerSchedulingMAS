@@ -33,7 +33,7 @@
   <SuperiorStandardVersion>AutomationML 2.10</SuperiorStandardVersion>
   <SourceDocumentInformation OriginName="" OriginID="" OriginVersion="" LastWritingDateTime="2024-04-15T16:57:28.147+02:00" OriginProjectID="" OriginProjectTitle="" OriginVendor="" OriginVendorURL="" />
   <InstanceHierarchy Name="ModuleTypePackage" ID="53bf2ad2-a048-4c72-a0c5-acfe001c70f7">
-    <InternalElement Name="eModule-Agents" ID="94cb58f6-bb61-4238-a038-0c3655336c4f" RefBaseSystemUnitPath="MTPSUCLib/ModuleTypePackage">
+    <InternalElement Name="Optimization" ID="94cb58f6-bb61-4238-a038-0c3655336c4f" RefBaseSystemUnitPath="MTPSUCLib/ModuleTypePackage">
       <Attribute Name="Version" AttributeDataType="xs:string">
         <Value>1.0.0</Value>
       </Attribute>
@@ -123,7 +123,7 @@
               <Value>03beed75-39fd-4b85-b24a-e1df97476760</Value>
             </Attribute>
             <Attribute Name="StateCur" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>77fc2cc9-223b-449f-97b9-35662c3517a0</Value>
             </Attribute>
             <Attribute Name="CommandEn" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
@@ -131,7 +131,7 @@
               <Value>a9753422-2a1f-4518-820e-1f7a623f00f8</Value>
             </Attribute>
             <Attribute Name="ProcedureCur" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>dc8cada6-216b-4461-bdd3-001e2e711bff</Value>
             </Attribute>
             <Attribute Name="ProcedureReq" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">

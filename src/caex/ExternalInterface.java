@@ -65,5 +65,5 @@ public class ExternalInterface {
 	public void settext(String text) {
 		this.text = text;
 	}
-
+	
 }

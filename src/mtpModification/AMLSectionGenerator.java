@@ -315,11 +315,6 @@ public class AMLSectionGenerator {
 		try {
 			// Copy the file from "in" to "out"
 			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-			// Call the method for customising the AML file
-			addSetpointToAML(targetPath.toString(), "Albania4ever_State", true, false);
-			addSetpointToAML(targetPath.toString(), "Albania4ever_Setpoint", false, true);
-
 			System.out.println("File successfully copied and modified.");
 
 		} catch (IOException e) {

@@ -86,12 +86,13 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 		// Determine the data type based on the identifier
 		String dataTypeString = rules.determineDataType(identifier);
 		NodeId dataTypeNodeId = getDataTypeNodeId(dataTypeString); // A method to get NodeId
+//		System.out.println("Identifier: " + identifier + " dataTypeString:" + dataTypeString);
 
 		// Call addVariable based on the determined data type
 		addVariable(parentNode, identifier, initialValue, dataTypeNodeId, dataTypeString);
 
 	}
-
+	
 	void addVariable(UaFolderNode parentNode, String identifier, Object initialValue, NodeId dataType,
 			String datatypeString) {
 		Object initialObject = null;
@@ -116,7 +117,7 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 				initialObject = unsignedByteValue;
 				break;
 			case "DWord":
-				initialObject = Long.parseLong(initialValue.toString());
+				initialObject =  Integer.parseInt(initialValue.toString());
 				break;
 			case "WQC":
 				short unsignedByteValue1 = (short) (Integer.parseInt(initialValue.toString()) & 0xFF);
@@ -135,10 +136,15 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 		}
 
 		NodeId variableId = newNodeId(identifier);
-		UaVariableNode variableNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext()).setNodeId(variableId)
-				.setAccessLevel(AccessLevel.READ_WRITE).setUserAccessLevel(AccessLevel.READ_WRITE)
-				.setBrowseName(newQualifiedName(identifier)).setDisplayName(LocalizedText.english(identifier))
-				.setDataType(dataType).setTypeDefinition(Identifiers.BaseDataVariableType).build();
+		UaVariableNode variableNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
+				.setNodeId(variableId)
+				.setAccessLevel(AccessLevel.READ_WRITE)
+				.setUserAccessLevel(AccessLevel.READ_WRITE)
+				.setBrowseName(newQualifiedName(identifier))
+				.setDisplayName(LocalizedText.english(identifier))
+				.setDataType(dataType)
+				.setTypeDefinition(Identifiers.BaseDataVariableType)
+				.build();
 
 		variableNode.setValue(new DataValue(new Variant(initialObject)));
 		variableNode.getFilterChain().addLast(new AttributeLoggingFilter(AttributeId.Value::equals));
@@ -150,13 +156,16 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 	private NodeId getDataTypeNodeId(String dataType) {
 		switch (dataType) {
 		case "DInt":
+			//return Identifiers.UInt32;
 			return Identifiers.Int32;
 		case "Bool":
 			return Identifiers.Boolean;
 		case "DWord":
-			return Identifiers.UInt32;
+			//return Identifiers.UInt32;
+			return Identifiers.Int32;
 		case "Int":
-			return Identifiers.Int16;
+			//return Identifiers.UInt32;
+			return Identifiers.Int32;
 		case "Byte":
 			return Identifiers.Byte;
 		case "String":

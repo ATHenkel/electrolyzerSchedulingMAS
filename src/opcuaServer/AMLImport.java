@@ -15,7 +15,7 @@ import caex.*;
 public class AMLImport {
 
 	private static final String MODULETYPEPACKAGE = "ModuleTypePackage";
-	private static final String MTP_INSTANCE = "eModule-Agents";
+	private static final String MTP_INSTANCE = "Optimization"; //TODO: Here: Set MTP-Instance name
 	private static final String COMMUNICATION = "Communication";
 	private static final String INSTANCE_LIST = "InstanceList";
 	private static final String SOURCE_LIST = "SourceList";
