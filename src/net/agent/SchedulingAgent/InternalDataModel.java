@@ -85,6 +85,7 @@ public class InternalDataModel extends AbstractUserObject {
 	private ArrayList<Integer> shutdownOrderList = new ArrayList<Integer>();
 	private boolean reschedulingActivated;
 	private int reschedulingPeriod;
+	private boolean isStartOptimization;
 
 	// Variables
 	private double x; // Cost optimal Utilization of the electrolyzer
@@ -180,6 +181,24 @@ public class InternalDataModel extends AbstractUserObject {
 	}
 
 	// ---- Getter & Setter ----
+	
+	/**
+	 * Gets boolean, if Optimization should be started
+	 * @return the rescheduling period
+	 */
+	public boolean isStartOptimization() {
+		return isStartOptimization;
+	}
+
+	
+	/**
+	 * Sets the isStartOptimization boolean
+	 * @param isStartOptimization boolean indicating if PEA-Agent should start Optimization
+	 */
+	public void setStartOptimization(boolean isStartOptimization) {
+		this.isStartOptimization = isStartOptimization;
+	}
+	
 
 	/**
 	 * Gets the period for which rescheduling is activated.

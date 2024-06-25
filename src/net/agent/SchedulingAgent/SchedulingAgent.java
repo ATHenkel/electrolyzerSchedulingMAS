@@ -64,10 +64,10 @@ public class SchedulingAgent extends Agent {
         if (extractAgentNumber(this.getLocalName()) == 1) {
         	addBehaviour(new OPCUAConnection(this));
 		}
-       //addBehaviour(new OPCUAConnection(this));
+  //     addBehaviour(new OPCUAConnection(this));
         
         // Obtain production goals from the DSM system
-//        addBehaviour(new GetGoalOfProduction(this));
+        addBehaviour(new GetGoalOfProduction(this));
         
         // Initialize phonebook with other agents
         initializePhoneBook();

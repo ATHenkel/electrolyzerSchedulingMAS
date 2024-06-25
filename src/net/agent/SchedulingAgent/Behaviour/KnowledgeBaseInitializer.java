@@ -286,7 +286,7 @@ public class KnowledgeBaseInitializer extends OneShotBehaviour {
 		List<Property> properties = new ArrayList<>();
 
 		// FilePath of the MTP database
-		String zipDirectoryPath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP4 - Integration\\Messe\\2024";
+		String zipDirectoryPath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\02_eModule\\AP3 - Prozessführung\\Enapter MTPs";
 
 		// Create complete path to the MTP file
 		String zipFilePath = Paths.get(zipDirectoryPath, mtpFileName).toString();

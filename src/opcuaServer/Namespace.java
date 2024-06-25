@@ -1,6 +1,11 @@
 package opcuaServer;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.milo.opcua.sdk.core.Reference;
 import org.eclipse.milo.opcua.sdk.server.OpcUaServer;
 import org.eclipse.milo.opcua.sdk.server.api.DataItem;
@@ -22,6 +27,7 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 	private static final String NAMESPACE_URI = "http://hsu-hh";
 	private final UaFolderNode parentFolderNode;
 	private final SubscriptionModel subscriptionModel;
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	/**
 	 * Add Module Type Package Folder
@@ -47,7 +53,47 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 				Identifiers.ObjectsFolder.expanded(), false));
 
 		createAndAddNodes();
+		
+		  // Schedule the update task to run every second
+		 scheduler.scheduleAtFixedRate(this::updateNodesDirectly, 0, 1, TimeUnit.SECONDS);
+		
 	}
+	
+    private void updateNodesDirectly() {
+        getNodeManager().getNodes().stream()
+            .filter(node -> node instanceof UaVariableNode)
+            .map(node -> (UaVariableNode) node)
+            .forEach(this::updateNodeValue);
+    }
+	
+    private void updateNodeValue(UaVariableNode node) {
+        DataValue currentValue = node.getValue();
+        Variant variant = currentValue.getValue();
+        Object value = variant.getValue();
+
+        // Logic to update value; currently just setting the same value
+        node.setValue(new DataValue(new Variant(value)));
+    }
+
+    private Object parseValue(String value, NodeId dataType) {
+        try {
+            if (Identifiers.Int32.equals(dataType)) {
+                return Integer.parseInt(value);
+            } else if (Identifiers.Float.equals(dataType)) {
+                return Float.parseFloat(value);
+            } else if (Identifiers.Boolean.equals(dataType)) {
+                return Boolean.parseBoolean(value);
+            } else if (Identifiers.String.equals(dataType)) {
+                return value;
+            } else if (Identifiers.Byte.equals(dataType)) {
+                return Short.parseShort(value);
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing value: " + e.getMessage());
+        }
+        return null;
+    }
+
 
 	private void createAndAddNodes() {
 		UaFolderNode folderNode = new UaFolderNode(getNodeContext(), folderNodeId,
@@ -86,7 +132,6 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 		// Determine the data type based on the identifier
 		String dataTypeString = rules.determineDataType(identifier);
 		NodeId dataTypeNodeId = getDataTypeNodeId(dataTypeString); // A method to get NodeId
-//		System.out.println("Identifier: " + identifier + " dataTypeString:" + dataTypeString);
 
 		// Call addVariable based on the determined data type
 		addVariable(parentNode, identifier, initialValue, dataTypeNodeId, dataTypeString);
@@ -128,8 +173,6 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
 				return; // Exit if type is not supported
 			}
 
-//			System.out.println("Setting node " + identifier + " with value " + initialObject + " of type "
-//					+ initialObject.getClass().getSimpleName());
 		} catch (NumberFormatException e) {
 			System.err.println("Error parsing initial value for " + identifier + ": " + e.getMessage());
 			return;

@@ -14,7 +14,7 @@ import net.agent.SchedulingAgent.SchedulingAgent;
 public class SetpointUpdater extends TickerBehaviour {
     private static final long serialVersionUID = -3300876452593347028L;
     private static final int UPDATE_PERIOD = 2000; // period in milliseconds
-    private static final int WRITE_TIME_DIFFERENCE = 30; // time in seconds
+    private static final int WRITE_TIME_DIFFERENCE = 90; // time in seconds
 
     private SchedulingAgent schedulingAgent;
 
@@ -44,7 +44,7 @@ public class SetpointUpdater extends TickerBehaviour {
 
     private void writeNewValueToPLC(LocalDateTime currentTime) {
         try {
-            NodeId setpointNodeId = new NodeId(2, "AnaView_AEL_StackUnit1--PEAAgent1_Setpoint.V");
+            NodeId setpointNodeId = new NodeId(2, "AnaView_AEM1_OptimizedSetpoint.V");
             UaVariableNode setpointNode = (UaVariableNode) schedulingAgent.getInternalDataModel().getAddressSpace().getNode(setpointNodeId);
 
             if (schedulingAgent.getInternalDataModel().isSchedulingComplete()) {

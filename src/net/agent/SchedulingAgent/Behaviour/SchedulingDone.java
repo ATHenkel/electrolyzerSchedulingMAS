@@ -39,7 +39,7 @@ public class SchedulingDone extends OneShotBehaviour {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
         String datePrefix = sdf.format(new Date());
         String fileName = "_Agent" + schedulingAgent.getLocalName() + "_SchedulingResults.csv";
-        String filePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\out\\" + datePrefix + fileName;
+        String filePath = "D:\\Dokumente\\OneDrive - Helmut-Schmidt-Universität\\04_Programmierung\\ElectrolyseurScheduling JADE\\out\\" + fileName;
         
         schedulingAgent.getInternalDataModel().getSchedulingResults().saveSchedulingResultsToCSV(filePath);
     }

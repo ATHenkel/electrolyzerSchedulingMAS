@@ -16,16 +16,27 @@ import jade.core.AID;
 public class InternalDataModel extends AbstractUserObject {
 	private static final long serialVersionUID = 5964943261619302454L;
 	
+	// OPC UA specific attributes for transferring optimized setpoints
+	private String endpointURL;
 	private OpcUaClient opcUaClient;
-    private List<EndpointDescription> endpoints;
-    private OpcUaClientConfigBuilder cfg;
-    private EndpointDescription configPoint;
-    private AddressSpace addressSpace;
+	private List<EndpointDescription> endpoints;
+	private OpcUaClientConfigBuilder cfg;
+	private EndpointDescription configPoint;
+	private AddressSpace addressSpace;
     private List<String> validEndpoints; 
     private List<AID> phoneBook;
     private List<Module> modules = new ArrayList<>();
+    private boolean startOptimizationActivated = false;
+    
+    public boolean isStartOptimizationActivated() {
+		return startOptimizationActivated;
+	}
 
-    // Module management
+	public void setStartOptimizationActivated(boolean startOptimizationActivated) {
+		this.startOptimizationActivated = startOptimizationActivated;
+	}
+
+	// Module management
     public void addModule(Module module) {
         modules.add(module);
     }
@@ -50,52 +61,122 @@ public class InternalDataModel extends AbstractUserObject {
         this.validEndpoints = validEndpoints;
     }
 
-    // OPC UA Client management
-    public OpcUaClient getOpcUaClient() {
-        return opcUaClient;
-    }
+    
+	// ---- OPC UA Communication ----
+	
+	/**
+	 * Gets the endpoint URL for the OPC UA connection.
+	 * @return the endpoinst URL
+	 */
+	public String getEndpointURL() {
+	    return endpointURL;
+	}
 
-    public void setOpcUaClient(OpcUaClient opcUaClient) {
-        this.opcUaClient = opcUaClient;
-    }
+	/**
+	 * Sets the endpoint URL for the OPC UA connection.
+	 * @param endpointURL the new endpoint URL
+	 */
+	public void setEndpointURL(String endpointURL) {
+	    this.endpointURL = endpointURL;
+	}
 
-    public List<EndpointDescription> getEndpoints() {
-        if (endpoints == null) {
-            endpoints = new ArrayList<>(); 
-        }
-        return endpoints;
-    }
+	/**
+	 * Retrieves the OPC UA client instance.
+	 * @return the OPC UA client.
+	 */
+	public OpcUaClient getOpcUaClient() {
+	    return opcUaClient;
+	}
 
-    public void setEndpoints(List<EndpointDescription> endpoints) {
-        this.endpoints = endpoints;
-    }
+	/**
+	 * Sets the OPC UA client instance.
+	 * @param opcUaClient the OPC UA client to be set.
+	 */
+	public void setOpcUaClient(OpcUaClient opcUaClient) {
+	    this.opcUaClient = opcUaClient;
+	}
 
-    public EndpointDescription getConfigPoint() {
-        return configPoint;
-    }
+	/**
+	 * Retrieves a list of endpoint descriptions. Initializes the list if it is null.
+	 * @return a list of endpoint descriptions.
+	 */
+	public List<EndpointDescription> getEndpoints() {
+	    if (endpoints == null) {
+	        endpoints = new ArrayList<>();
+	    }
+	    return endpoints;
+	}
+	
+	public List<EndpointDescription> getPeaEndpoints() {
+	    if (endpoints == null) {
+	    	endpoints = new ArrayList<>();
+	    }
+	    return endpoints;
+	}
 
-    public void setConfigPoint(EndpointDescription configPoint) {
-        this.configPoint = configPoint;
-    }
+	/**
+	 * Sets the list of endpoint descriptions.
+	 * @param endpoints the list of endpoint descriptions to be set.
+	 */
+	public void setEndpoints(List<EndpointDescription> endpoints) {
+	    this.endpoints = endpoints;
+	}
 
-    public AddressSpace getAddressSpace() {
-        return addressSpace;
-    }
+	/**
+	 * Retrieves the configuration point for the OPC UA connection.
+	 * @return the configuration point.
+	 */
+	public EndpointDescription getConfigPoint() {
+	    return configPoint;
+	}
+	
+	/**
+	 * Sets the configuration point for the OPC UA connection.
+	 * @param configPoint the configuration point to be set.
+	 */
+	public void setConfigPoint(EndpointDescription configPoint) {
+	    this.configPoint = configPoint;
+	}
+	
 
-    public void setAddressSpace(AddressSpace addressSpace) {
-        this.addressSpace = addressSpace;
-    }
+	/**
+	 * Retrieves the OPC UA client's address space.
+	 * @return the address space.
+	 */
+	public AddressSpace getAddressSpace() {
+	    return addressSpace;
+	}
 
-    public OpcUaClientConfigBuilder getCfg() {
-        if (cfg == null) {
-            cfg = new OpcUaClientConfigBuilder();
-        }
-        return cfg;
-    }
 
-    public void setCfg(OpcUaClientConfigBuilder cfg) {
-        this.cfg = cfg;
-    }
+	/**
+	 * Sets the OPC UA client's address space.
+	 * @param addressSpace the address space to be set.
+	 */
+	public void setAddressSpace(AddressSpace addressSpace) {
+	    this.addressSpace = addressSpace;
+	}
+	
+
+	/**
+	 * Retrieves the OPC UA client configuration builder, initializing it if necessary.
+	 * @return the configuration builder.
+	 */
+	public OpcUaClientConfigBuilder getCfg() {
+	    if (cfg == null) {
+	        cfg = new OpcUaClientConfigBuilder();
+	    }
+	    return cfg;
+	}
+	
+
+	/**
+	 * Sets the OPC UA client configuration builder.
+	 * @param cfg the configuration builder to be set.
+	 */
+	public void setCfg(OpcUaClientConfigBuilder cfg) {
+	    this.cfg = cfg;
+	}
+ 
 
     // Phone book management
     public void addAID2PhoneBook(AID agentAID) {
@@ -109,7 +190,7 @@ public class InternalDataModel extends AbstractUserObject {
         return phoneBook;
     }
 
-    public void setPhoneBook(List<AID> phoneBook) {
+        public void setPhoneBook(List<AID> phoneBook) {
         this.phoneBook = phoneBook;
     }
 }

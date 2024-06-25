@@ -99,27 +99,27 @@
               <Value>839dc190-3610-4567-9d56-71b12eae7482</Value>
             </Attribute>
             <Attribute Name="CommandOp" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>2b09be83-3156-4e26-9d19-9adb6c210df0</Value>
             </Attribute>
             <Attribute Name="CommandInt" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>e8c61c07-1f2e-4a9c-bf8f-037f84abdbbd</Value>
             </Attribute>
             <Attribute Name="CommandExt" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>633503b4-2b14-4128-ad51-7bfc4713bf35</Value>
             </Attribute>
             <Attribute Name="ProcedureOp" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>35258308-8401-457c-bea9-ca93593f2eb4</Value>
             </Attribute>
             <Attribute Name="ProcedureInt" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>273c0ab1-6c77-40af-be60-eacae503f3f5</Value>
             </Attribute>
             <Attribute Name="ProcedureExt" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>03beed75-39fd-4b85-b24a-e1df97476760</Value>
             </Attribute>
             <Attribute Name="StateCur" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
@@ -127,7 +127,7 @@
               <Value>77fc2cc9-223b-449f-97b9-35662c3517a0</Value>
             </Attribute>
             <Attribute Name="CommandEn" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>0</DefaultValue>
               <Value>a9753422-2a1f-4518-820e-1f7a623f00f8</Value>
             </Attribute>
             <Attribute Name="ProcedureCur" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
@@ -135,7 +135,7 @@
               <Value>dc8cada6-216b-4461-bdd3-001e2e711bff</Value>
             </Attribute>
             <Attribute Name="ProcedureReq" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">
-              <DefaultValue>255</DefaultValue>
+              <DefaultValue>1</DefaultValue>
               <Value>ef7f5a05-5d82-4fe4-aa68-dd410bfaeadd</Value>
             </Attribute>
             <Attribute Name="PosTextID" AttributeDataType="xs:string" RefAttributeType="MTPATLib/IDReferenceType/IDLinkAttributeType">

@@ -18,6 +18,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import agentgui.core.application.Application;
+import agentgui.core.jade.Platform;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +34,7 @@ import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.wrapper.AgentContainer;
+import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 import mtpModification.AMLSectionGenerator;
 import net.agent.BrokerAgent.BrokerAgent;
@@ -74,6 +79,9 @@ public class instantiateAgents extends OneShotBehaviour {
             return null;
         });
 
+        //TODO: Here Behaviour added 
+        this.brokerAgent.addBehaviour(new OPCUAConnection(brokerAgent));
+
     }
 
     /**
@@ -84,7 +92,6 @@ public class instantiateAgents extends OneShotBehaviour {
      * @return A list of {@link net.agent.BrokerAgent.Module} objects representing the modules parsed from the topology file.
      */
     private List<net.agent.BrokerAgent.Module> loadModules() {
-      //  String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\Topology\\ElectrolysisPlant.mtd";
         String topologyFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Dtec-ElectrolysisPlant\\Topology\\ElectrolysisPlant.mtd";
         PlantTopologyParser parser = new PlantTopologyParser(brokerAgent);
         List<net.agent.BrokerAgent.Module> modules = parser.parseTopologyFile(topologyFilePath);
@@ -108,7 +115,6 @@ public class instantiateAgents extends OneShotBehaviour {
     }
 
     private boolean isElectrolyser(net.agent.BrokerAgent.Module module) {
-       // String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Fair-Electrolysis-Plant\\MTP Lib\\" + module.visibleName + ".aml";
         String amlFilePath = "C:\\Program Files\\OrchestrationDesigner With800xA (2024)\\2024_Dtec-ElectrolysisPlant\\MTP Lib\\" + module.visibleName + ".aml";
         if (new File(amlFilePath).exists()) {
             return containsElectrolyserInfo(amlFilePath);
@@ -125,17 +131,15 @@ public class instantiateAgents extends OneShotBehaviour {
      * @param modules The list of modules used to initialize the agent platform. 
      */
     private void initializeAgentPlatform(List<net.agent.BrokerAgent.Module> modules) {
-        AgentContainer container = startJadePlatform();
+    	Platform jadePlatform = Application.getJadePlatform();
+    	AgentContainer awbContainer = jadePlatform.getContainer("agentinstantiation");
+        
         List<AID> phoneBook = createPhoneBook(modules);
-        instantiateSchedulingAgents(container, modules, phoneBook);
+        this.brokerAgent.getInternalDataModel().setPhoneBook(phoneBook);
+        instantiateSchedulingAgents(awbContainer, modules, phoneBook);
     }
 
-    private AgentContainer startJadePlatform() {
-        Runtime rt = Runtime.instance();
-        Profile p = new ProfileImpl();
-        return rt.createMainContainer(p);
-    }
-
+    
     /**
      * Creates a phone book for the agent system by generating unique agent identifiers (AID) from the list of modules.
      * Each module's instance name is used to construct an AID, with a numerical suffix indicating its order.
@@ -167,9 +171,12 @@ public class instantiateAgents extends OneShotBehaviour {
         for (int i = 0; i < phoneBook.size(); i++) {
             String mtpFileName = modules.get(i).visibleName + ".mtp";
             AID agentAID = phoneBook.get(i);
+            
             SchedulingAgent schedulingAgent = new SchedulingAgent("opc.tcp://127.0.0.1:4200", mtpFileName, modules.size(), phoneBook);
             try {
-                container.acceptNewAgent(agentAID.getLocalName(), schedulingAgent).start();
+            	Platform jadePlatform = Application.getJadePlatform();
+            	AgentContainer awbContainer = jadePlatform.getContainer("agentinstantiation");  
+            	awbContainer.acceptNewAgent(agentAID.getLocalName(), schedulingAgent).start();
                 System.out.println("PEA-agent named " + agentAID.getLocalName() + " was instantiated and started.");
             } catch (StaleProxyException e) {
                 e.printStackTrace();

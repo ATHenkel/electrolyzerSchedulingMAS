@@ -30,7 +30,11 @@ public class GetGoalOfProduction extends OneShotBehaviour {
         connectAndReadFromDatabase();
 
         // Schedule the next behavior in the agent's life cycle.
-        transitionToNextBehavior();
+        
+        if (this.schedulingAgent.getInternalDataModel().isStartOptimization()) {
+        	System.out.println("Agent: " + this.schedulingAgent.getLocalName() +  " start Optimization MinimizeX.");
+        	transitionToNextBehavior();
+		}
     }
 
     /**
